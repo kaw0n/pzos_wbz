@@ -1,7 +1,7 @@
 import Navbar from "./_components/Navbar";
 import Sidebar from "./_components/Menu";
 
-const DashboardLayout = ({
+const SearchLayout = ({
     children
 }:{
     children : React.ReactNode
@@ -28,4 +28,4 @@ const DashboardLayout = ({
      );
 }
  
-export default DashboardLayout;
+export default SearchLayout;

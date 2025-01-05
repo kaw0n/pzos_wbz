@@ -1,5 +1,3 @@
-import { Chilanka } from "next/font/google";
-
 const AuthLayout = ({
     children
 }:{

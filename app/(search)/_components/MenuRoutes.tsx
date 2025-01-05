@@ -12,7 +12,7 @@ const guestRoutes = [
     {
         icon: CircleUserRound,
         label: "Profil",
-        href:"/search"
+        href:"/profile"
     },
 ]
 
