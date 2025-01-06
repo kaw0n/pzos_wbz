@@ -39,7 +39,7 @@ const MenuRoutes = () => {
     const routes = isOrganiserPage ? organiserRoutes : competitorRoutes;
     
     return ( 
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col md:flex-row md:items-center w-full md:gap-8">
             {routes.map((route) => (
                 <MenuItem
                 key={route.href}

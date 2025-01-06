@@ -4,13 +4,12 @@ import MenuRoutes from "./MenuRoutes";
 const Menu = () => {
     return ( 
         <div className="
-        h-full 
-        border-r 
+        h-full
         flex 
-        flex-col 
+        flex-col
+        md:flex-row 
         overflow-y-auto 
-        bg-white 
-        shadow-sm">
+        bg-white ">
             <div className="p-6">
                 <Logo/>
             </div>
