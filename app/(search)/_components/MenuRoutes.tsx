@@ -1,9 +1,10 @@
 "use client"
 
-import { CircleUserRound, Compass } from "lucide-react";
-import SidebarItem from "./MenuItem";
+import { CircleUserRound, Compass, DollarSign, LayoutList } from "lucide-react";
+import MenuItem from "./MenuItem";
+import { usePathname } from "next/navigation";
 
-const guestRoutes = [
+const competitorRoutes = [
     {
         icon: Compass,
         label: "Przeglądaj",
@@ -16,14 +17,31 @@ const guestRoutes = [
     },
 ]
 
+const organiserRoutes = [
+    {
+        icon: LayoutList,
+        label: " Wydarzenia",
+        href:"/organiser/events"
+    },
+    {
+        icon: DollarSign,
+        label: "Przychody",
+        href:"/organiser/income"
+    },
+]
+
 const MenuRoutes = () => {
 
-    const routes = guestRoutes
+    const pathname = usePathname();
+
+    const isOrganiserPage = pathname?.includes("/organiser");
+
+    const routes = isOrganiserPage ? organiserRoutes : competitorRoutes;
     
     return ( 
         <div className="flex flex-col w-full">
             {routes.map((route) => (
-                <SidebarItem
+                <MenuItem
                 key={route.href}
                 icon={route.icon}
                 label={route.label}
