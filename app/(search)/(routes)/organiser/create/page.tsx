@@ -1,5 +1,5 @@
 "use client"
-
+//ta strona na razie nie jest porzebna przyda się potem do zapisywania się na wydarzenia
 import axios from 'axios';
 import  {zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';

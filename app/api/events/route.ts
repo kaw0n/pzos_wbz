@@ -8,7 +8,6 @@ export async function POST(
 ) {
     try{
         const { userId } = await auth();
-        const {title} = await req.json();
 
         if(!userId){
             return new NextResponse('Brak autoryzacji', { status: 401 });
@@ -16,8 +15,7 @@ export async function POST(
 
         const event  = await db.event.create({
             data: {
-                title,
-                userId,
+                userId
             }
         })
 

@@ -16,7 +16,7 @@ datasource db {
 model Event {
   id          String    @id @default(uuid())
   userId      String
-  title       String    @db.Text //to ma być opcjonalne potem
+  title       String?   @db.Text //to ma być opcjonalne potem
   description String?   @db.Text
   imageUrl    String?   @db.Text
   location    String?   @db.Text //lokalizacja
