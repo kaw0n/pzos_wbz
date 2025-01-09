@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 const isOrganiserPage = () => {
 
     const router = useRouter()
-    const {userId} = useAuth()
+    const {userId} =  useAuth()
 
     const handleCreateEvent = async () => {
         try {
