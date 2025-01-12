@@ -5,6 +5,8 @@ import { GaugeCircle, LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
 import TitleForm from "./_components/TitleForm";
 import DescriptionForm from "./_components/DescriptionForm";
+import DateForm from "./_components/DateForm";
+import MapForm from "./_components/MapForm";
 
 const EventIdPage = async({
     params
@@ -39,7 +41,7 @@ const EventIdPage = async({
         event.description,
         event.imageUrl,
         event.location,
-        event.eventDate,
+        event.date,
         event.price,
         event.categoryId,
 
@@ -78,6 +80,14 @@ const EventIdPage = async({
                     eventId={event.id}
                     />
                     <DescriptionForm
+                    initialData={event}
+                    eventId={event.id}
+                    />
+                    <DateForm
+                    initialData={event}
+                    eventId={event.id}
+                    />
+                    <MapForm
                     initialData={event}
                     eventId={event.id}
                     />

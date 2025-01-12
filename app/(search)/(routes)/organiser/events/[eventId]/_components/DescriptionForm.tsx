@@ -28,7 +28,7 @@ interface DescriptionFormProps{
 
 const formSchema = z.object({
     description: z.string().min(1, {
-        message:" Nazwa jest wymagana"
+        message:" Opis jest wymagana"
     })
 })
 
@@ -65,28 +65,26 @@ export const DescriptionForm = ({
     }
     return(
         <div className={cn(
-            "mt-6 border rounded-full p-10",
-            initialData.description ? "bg-green-100" : "bg-gray-100"
-        )}>
-            <div className="font-medium flex items-center justify-between">
-                Opis wydarzenia
+                "mt-6 border rounded-full p-10",
+                initialData.description ? "bg-green-100" : "bg-gray-100"
+              )}>
+            <div className="font-md flex items-center justify-between">
+                Opis kursu
                 <Button onClick={toggleEdit} variant="outline" className="rounded-full">
-                    {isEditing &&(
-                        <>
-                            <PenOff className="h-4 w-4 mr-2"/>
-                            Anuluj
-                        </>
-                    )}
-                    {!isEditing &&(
-                        <>
-                            <PenLine className="h-4 w-4 mr-2"/>
-                            Edytuj
-                        </>
-                    )}
-                    
+                {isEditing ? (
+                    <>
+                    <PenOff className="h-4 w-4 mr-2"/>
+                    Anuluj
+                    </>
+                ):(
+                    <>
+                        <PenLine className="h-4 w-4 mr-2"/>
+                        Edytuj
+                    </>
+                )} 
                 </Button>
             </div>
-            {!isEditing &&(
+            {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
                     !initialData.description && "text-slate-500 italic"
@@ -98,20 +96,22 @@ export const DescriptionForm = ({
                 <Form {...form}>
                     <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4 mt-4">
+                    className="space-y-4 mt-4"
+                    >
                         <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field})=>(
-                            <FormItem>
-                                <FormControl>
-                                    <Textarea
-                                    disabled={isSubmitting}
-                                    placeholder="np. 'Witamy na Mistrzostwach Polski...'"
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Textarea
+                                        disabled={isSubmitting}
+                                        placeholder="e.g, `Ten kurs jest o...`"
+                                        {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
                         )}
                         />
                         <div className="flex items-center gap-x-2">

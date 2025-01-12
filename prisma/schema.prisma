@@ -19,8 +19,8 @@ model Event {
   title       String?   @db.Text
   description String?   @db.Text
   imageUrl    String?   @db.Text
-  location    String?   @db.Text //lokalizacja
-  eventDate   DateTime? //data wydarzenia
+  location    Json? //lokalozacja
+  date        DateTime? //data wydarzenia
   price       Float?
   isPublic    Boolean   @default(false)
 
