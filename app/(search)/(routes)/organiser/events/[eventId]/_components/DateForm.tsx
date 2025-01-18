@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import DatePicker from "./DatePicker";
 
 interface DateFormProps {
-  initialData: Event;
+  eventData: Event;
   eventId: string;
 }
 
@@ -25,11 +25,11 @@ const formSchema = z.object({
   date: z.date(),
 });
 
-export const DateForm = ({ initialData, eventId }: DateFormProps) => {
+export const DateForm = ({ eventData, eventId }: DateFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData.date ? new Date(initialData.date) : new Date(),
+      date: eventData.date ? new Date(eventData.date) : new Date(),
     },
   });
 
@@ -37,15 +37,15 @@ export const DateForm = ({ initialData, eventId }: DateFormProps) => {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const toggleEdit = () => setIsEditing((current) => !current);
+  const editingState = () => setIsEditing((current) => !current);
 
   const router = useRouter();
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/events/${eventId}`, values);
       toast.success("Wydarzenie zaktualizowane");
-      toggleEdit();
+      editingState();
       router.refresh();
     } catch {
       toast.error("Coś poszło nie tak");
@@ -56,12 +56,12 @@ export const DateForm = ({ initialData, eventId }: DateFormProps) => {
     <div
       className={cn(
         "mt-6 border rounded-full p-10",
-        initialData.date ? "bg-green-100" : "bg-gray-100"
+        eventData.date ? "bg-green-100" : "bg-gray-100"
       )}
     >
       <div className="font-medium flex items-center justify-between">
         Data wydarzenia
-        <Button onClick={toggleEdit} variant="outline" className="rounded-full">
+        <Button onClick={editingState} variant="outline" className="rounded-full">
           {isEditing && (
             <>
               <PenOff className="h-4 w-4 mr-2" />
@@ -81,18 +81,18 @@ export const DateForm = ({ initialData, eventId }: DateFormProps) => {
         <p
           className={cn(
             "text-sm mt-2",
-            !initialData?.date && "text-slate-500 italic"
+            !eventData?.date && "text-slate-500 italic"
           )}
         >
-          {initialData?.date
-            ? format(new Date(initialData.date), "PPP")
+          {eventData?.date
+            ? format(new Date(eventData.date), "PPP")
             : "Brak daty"}
         </p>
       )}
 
       {isEditing && (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 mt-4">
             <FormField
               control={form.control}
               name="date"

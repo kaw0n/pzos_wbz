@@ -21,26 +21,26 @@ import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 
 interface DescriptionFormProps{
-    initialData: Event
+    eventData: Event
     eventId: string;
     
 }
 
 const formSchema = z.object({
     description: z.string().min(1, {
-        message:" Opis jest wymagana"
+        message:" Opis jest wymagany"
     })
 })
 
 export const DescriptionForm = ({
-    initialData,
+    eventData,
     eventId
 }: DescriptionFormProps) =>{
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues : {
-            description: initialData?.description || ""
+            description: eventData?.description || ""
         },
     });
 
@@ -48,16 +48,16 @@ export const DescriptionForm = ({
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const toggleEdit =() => setIsEditing((current) =>!current)
+    const editingState =() => setIsEditing((current) =>!current)
 
     const router = useRouter();
 
     
-    const onSubmit = async (values: z.infer<typeof formSchema>) =>{
+    const handleSubmit = async (values: z.infer<typeof formSchema>) =>{
         try{
             await axios.patch(`/api/events/${eventId}`, values)
             toast.success("Wydarzenie zaktualizowane")
-            toggleEdit();
+            editingState();
             router.refresh();
         } catch {
             toast.error("Coś poszło nie tak")
@@ -66,11 +66,11 @@ export const DescriptionForm = ({
     return(
         <div className={cn(
                 "mt-6 border rounded-full p-10",
-                initialData.description ? "bg-green-100" : "bg-gray-100"
+                eventData.description ? "bg-green-100" : "bg-gray-100"
               )}>
             <div className="font-md flex items-center justify-between">
-                Opis kursu
-                <Button onClick={toggleEdit} variant="outline" className="rounded-full">
+                Opis wydarzenia
+                <Button onClick={editingState} variant="outline" className="rounded-full">
                 {isEditing ? (
                     <>
                     <PenOff className="h-4 w-4 mr-2"/>
@@ -87,15 +87,15 @@ export const DescriptionForm = ({
             {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.description && "text-slate-500 italic"
+                    !eventData.description && "text-slate-500 italic"
                 )}>
-                    {initialData.description || "Brak opisu"}
+                    {eventData.description || "Brak opisu"}
                 </p>
             )}
             {isEditing && (
                 <Form {...form}>
                     <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(handleSubmit)}
                     className="space-y-4 mt-4"
                     >
                         <FormField
@@ -106,7 +106,7 @@ export const DescriptionForm = ({
                                     <FormControl>
                                         <Textarea
                                         disabled={isSubmitting}
-                                        placeholder="e.g, `Ten kurs jest o...`"
+                                        placeholder="np. `Mistrzostwa Polski w MTBO`"
                                         {...field}
                                         />
                                     </FormControl>

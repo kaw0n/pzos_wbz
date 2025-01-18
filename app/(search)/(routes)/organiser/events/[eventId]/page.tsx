@@ -6,7 +6,13 @@ import { redirect } from "next/navigation";
 import TitleForm from "./_components/TitleForm";
 import DescriptionForm from "./_components/DescriptionForm";
 import DateForm from "./_components/DateForm";
-import MapForm from "./_components/MapForm";
+import  ImageForm  from "./_components/ImageForm";
+import dynamic from "next/dynamic";
+import CategoryForm from "./_components/CategoryForm";
+const MapForm = dynamic(() => import('./_components/MapForm'), { ssr: false });
+
+
+
 
 const EventIdPage = async({
     params
@@ -44,16 +50,19 @@ const EventIdPage = async({
         event.date,
         event.price,
         event.categoryId,
-
     ];
 
+    const categories = await db.category.findMany({
+        orderBy: {
+            name: "asc",
+        },
+    })
 
+    const allFields = requiredFields.length;
 
-    const totalFields = requiredFields.length;
+    const completedFields = requiredFields.filter(Boolean).length;
 
-    const filledFields = requiredFields.filter(Boolean).length;
-
-    const progressCount = `(${filledFields}/${totalFields})`;
+    const progressCount = `(${completedFields}/${allFields})`;
 
     return ( 
         <div className="p-6">
@@ -76,20 +85,32 @@ const EventIdPage = async({
                         </h2>
                     </div>
                     <TitleForm
-                    initialData={event}
+                    eventData={event}
                     eventId={event.id}
                     />
                     <DescriptionForm
-                    initialData={event}
+                    eventData={event}
                     eventId={event.id}
                     />
                     <DateForm
-                    initialData={event}
+                    eventData={event}
                     eventId={event.id}
                     />
                     <MapForm
-                    initialData={event}
+                    eventData={event}
                     eventId={event.id}
+                    />
+                    <ImageForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <CategoryForm
+                    eventData={event}
+                    eventId={event.id}
+                    options={categories.map((category)=>({
+                        label: category.name,
+                        value: category.id
+                    }))}
                     />
                 </div>
             </div>

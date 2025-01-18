@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface TitleFormProps{
-    initialData: Event
+    eventData: Event
     eventId: string;
     
 }
@@ -33,14 +33,14 @@ const formSchema = z.object({
 })
 
 export const TitleForm = ({
-    initialData,
+    eventData,
     eventId
 }: TitleFormProps) =>{
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues : {
-            title: initialData?.title || ""
+            title: eventData?.title || ""
         },
     });
 
@@ -48,16 +48,16 @@ export const TitleForm = ({
 
     const [isEditing, setIsEditing] = useState(false);
 
-    const toggleEdit =() => setIsEditing((current) =>!current)
+    const editingState =() => setIsEditing((current) =>!current)
 
     const router = useRouter();
 
     
-    const onSubmit = async (values: z.infer<typeof formSchema>) =>{
+    const handleSubmit = async (values: z.infer<typeof formSchema>) =>{
         try{
             await axios.patch(`/api/events/${eventId}`, values)
             toast.success("Wydarzenie zaktualizowane")
-            toggleEdit();
+            editingState();
             router.refresh();
         } catch {
             toast.error("Coś poszło nie tak")
@@ -66,11 +66,11 @@ export const TitleForm = ({
     return(
         <div className={cn(
             "mt-6 border rounded-full p-10",
-            initialData.title ? "bg-green-100" : "bg-gray-100"
+            eventData.title ? "bg-green-100" : "bg-gray-100"
         )}>
             <div className="font-medium flex items-center justify-between">
                 Nazwa wydarzenia
-                <Button onClick={toggleEdit} variant="outline" className="rounded-full">
+                <Button onClick={editingState} variant="outline" className="rounded-full">
                     {isEditing &&(
                         <>
                             <PenOff className="h-4 w-4 mr-2"/>
@@ -89,15 +89,15 @@ export const TitleForm = ({
             {!isEditing &&(
                 <p className={cn(
                     "text-sm mt-2",
-                    !initialData.title && "text-slate-500 italic"
+                    !eventData.title && "text-slate-500 italic"
                 )}>
-                    {initialData.title || "Brak tytułu"}
+                    {eventData.title || "Brak tytułu"}
                 </p>
             )}
             {isEditing && (
                 <Form {...form}>
                     <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(handleSubmit)}
                     className="space-y-4 mt-4">
                         <FormField
                         control={form.control}

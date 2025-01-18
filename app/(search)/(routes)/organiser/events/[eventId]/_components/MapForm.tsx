@@ -53,26 +53,31 @@ const fetchCoordinatesFromAddress = async (address: string) => {
 };
 
 interface LocationFormProps {
-  initialData: { location: unknown };
+  eventData: { location: unknown };
   eventId: string;
 }
 
-const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
+const LocationForm = ({ eventData, eventId }: LocationFormProps) => {
+
   const [address, setAddress] = useState("");
   const [position, setPosition] = useState(
-    parseLocation(initialData.location)
+    parseLocation(eventData.location)
   );
+
   const [isEditing, setIsEditing] = useState(false);
-  const toggleEdit = () => setIsEditing((current) => !current);
+
+  const editingState = () => setIsEditing((current) => !current);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
+
   const mapRef = useRef<L.Map | null>(null);
 
   const MapClickHandler = () => {
     useMapEvents({
       click: (e: L.LeafletMouseEvent) => {
-        if (!isEditing) return; // Nie reaguj na kliknięcia, jeśli nie edytujesz
+        if (!isEditing) return;
         setPosition({ lat: e.latlng.lat, lng: e.latlng.lng });
         axios
           .get(
@@ -96,12 +101,13 @@ const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
       setPosition(location);
 
       if (mapRef.current) {
-        mapRef.current.setView([location.lat, location.lng], 13);
+        mapRef.current.setView([location.lat, location.lng], 12);
       }
     } catch {
       toast.error("Nie znaleziono lokalizacji.");
     }
   };
+  
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -113,7 +119,7 @@ const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
       router.refresh();
 
       if (mapRef.current) {
-        mapRef.current.setView([position.lat, position.lng], 13);
+        mapRef.current.setView([position.lat, position.lng], 12);
         mapRef.current.invalidateSize();
       }
     } catch {
@@ -135,12 +141,12 @@ const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
     <div
       className={cn(
         "mt-6 border rounded-full p-28",
-        initialData.location ? "bg-green-100 " : "bg-gray-100 mt-6"
+        eventData.location ? "bg-green-100 " : "bg-gray-100 mt-6"
       )}
     >
       <div className="font-md flex items-center justify-between">
         Lokalizacja
-        <Button onClick={toggleEdit} variant="outline" className="rounded-full">
+        <Button onClick={editingState} variant="outline" className="rounded-full">
           {isEditing ? (
             <>
               <PenOff className="h-4 w-4 mr-2" />
@@ -154,11 +160,11 @@ const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
           )}
         </Button>
       </div>
-      {!initialData.location && (
+      {!eventData.location && (
         <p
           className={cn(
             "text-sm mt-2",
-            !initialData.location && "text-slate-500 italic"
+            !eventData.location && "text-slate-500 italic"
           )}
         >
           Brak lokalizacji
@@ -178,9 +184,8 @@ const LocationForm = ({ initialData, eventId }: LocationFormProps) => {
         )}
         <MapContainer
           center={[position.lat, position.lng]}
-          zoom={13}
-          scrollWheelZoom={false}
-          className="h-64 w-full"
+          zoom={12}
+          className="h-80 w-full"
           //@ts-ignore
           whenReady={(mapEvent: L.LeafletEvent) => {
             mapRef.current = mapEvent.target as L.Map;
