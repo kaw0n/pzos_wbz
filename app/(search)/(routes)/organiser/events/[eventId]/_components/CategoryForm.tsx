@@ -23,7 +23,6 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { PenLine, PenOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 
 interface CategoryOption {
@@ -78,7 +77,7 @@ export const CategoryForm = ({
   return (
     <div
       className={cn(
-        "mt-6 border rounded-full p-10",
+        "mt-6 border rounded-full p-6",
         eventData.categoryId ? "bg-green-100" : "bg-gray-100"
       )}
     >

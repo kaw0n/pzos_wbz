@@ -9,6 +9,10 @@ import DateForm from "./_components/DateForm";
 import  ImageForm  from "./_components/ImageForm";
 import dynamic from "next/dynamic";
 import CategoryForm from "./_components/CategoryForm";
+import PriceForm from "./_components/PriceForm";
+import FilesForm from "./_components/FilesForm";
+import  PublishAction  from "./_components/PublishAction";
+import DeleteAction from "./_components/DeleteAction";
 const MapForm = dynamic(() => import('./_components/MapForm'), { ssr: false });
 
 
@@ -31,6 +35,13 @@ const EventIdPage = async({
     const event = await db.event.findUnique({
         where: {
             id: params.eventId
+        },
+        include:{
+            files: {
+                orderBy: {
+                    createdAt: "desc"
+                }
+            }
         }
     })
 
@@ -64,17 +75,25 @@ const EventIdPage = async({
 
     const progressCount = `(${completedFields}/${allFields})`;
 
+    const completeStatus = completedFields === allFields;
+
     return ( 
         <div className="p-6">
             <div className="flex items-center">
                 <div className="flex flex-col gap-y-2">
-                    <h1 className="text-2xl font-medium">
+                    <h1 className="text-2xl font-medium ">
                         Edytuj wydarzenie
                     </h1>
                     <span className="text-sm text-slate-700">
                         Wypełnij wszystkie pola {progressCount}
                     </span>
                 </div>
+                <div className="justify-end ml-auto">
+                <DeleteAction
+                eventId={event.id}
+                />
+                </div>
+                
             </div>
             <div className="grid grid-cols-1 gap-6 mt-16">
                 <div>
@@ -112,6 +131,22 @@ const EventIdPage = async({
                         value: category.id
                     }))}
                     />
+                    <PriceForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <FilesForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <div className="p-6 items-right">
+                        <PublishAction
+                        disabled={!completeStatus}
+                        eventId={event.id}
+                        isPublic={event.isPublic}
+                        />
+                    </div>
+                    
                 </div>
             </div>
         </div>

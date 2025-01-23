@@ -65,7 +65,8 @@ export const DescriptionForm = ({
     }
     return(
         <div className={cn(
-                "mt-6 border rounded-full p-10",
+                "mt-6 border rounded-full p-6",
+                isEditing ? "p-10" : "p-6",
                 eventData.description ? "bg-green-100" : "bg-gray-100"
               )}>
             <div className="font-md flex items-center justify-between">
@@ -89,7 +90,11 @@ export const DescriptionForm = ({
                     "text-sm mt-2",
                     !eventData.description && "text-slate-500 italic"
                 )}>
-                    {eventData.description || "Brak opisu"}
+                    {eventData.description
+                    ? eventData.description.length > 250
+                    ? `${eventData.description.slice(0, 250)}...`
+                    : eventData.description
+                    : "Brak opisu"}
                 </p>
             )}
             {isEditing && (

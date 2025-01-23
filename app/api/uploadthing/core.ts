@@ -19,7 +19,7 @@ export const ourFileRouter = {
     .onUploadComplete(()=>{
         console.log("Upload completed for eventImage");
     }),
-  eventAttachment: f(["text","image","pdf"])
+  eventFile: f(["text","image","pdf"])
     .middleware(() => authHandler())
     .onUploadComplete(()=>{})
 } satisfies FileRouter;

@@ -17,30 +17,29 @@ import {
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { PenLine, PenOff } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { formatPrice } from "@/lib/format";
 
-interface TitleFormProps{
+interface PriceFormProps{
     eventData: Event
     eventId: string;
     
 }
 
 const formSchema = z.object({
-    title: z.string().min(1, {
-        message:" Nazwa jest wymagana"
-    })
+    price: z.coerce.number()
 })
 
-export const TitleForm = ({
+export const PriceForm = ({
     eventData,
     eventId
-}: TitleFormProps) =>{
+}: PriceFormProps) =>{
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues : {
-            title: eventData?.title || ""
+            price: eventData?.price || 0
         },
     });
 
@@ -65,54 +64,55 @@ export const TitleForm = ({
     }
     return(
         <div className={cn(
-            "mt-6 border rounded-full p-6",
-            eventData.title ? "bg-green-100" : "bg-gray-100"
-        )}>
-            <div className="font-medium flex items-center justify-between">
-                Nazwa wydarzenia
+                "mt-6 border rounded-full p-6",
+                eventData.price ? "bg-green-100" : "bg-gray-100"
+              )}>
+            <div className="font-md flex items-center justify-between">
+                Cena wpisowego
                 <Button onClick={editingState} variant="outline" className="rounded-full">
-                    {isEditing &&(
-                        <>
-                            <PenOff className="h-4 w-4 mr-2"/>
-                            Anuluj
-                        </>
-                    )}
-                    {!isEditing &&(
-                        <>
-                            <PenLine className="h-4 w-4 mr-2"/>
-                            Edytuj
-                        </>
-                    )}
-                    
+                {isEditing ? (
+                    <>
+                    <PenOff className="h-4 w-4 mr-2"/>
+                    Anuluj
+                    </>
+                ):(
+                    <>
+                        <PenLine className="h-4 w-4 mr-2"/>
+                        Edytuj
+                    </>
+                )} 
                 </Button>
             </div>
-            {!isEditing &&(
+            {!isEditing && (
                 <p className={cn(
                     "text-sm mt-2",
-                    !eventData.title && "text-slate-500 italic"
+                    !eventData.price && "text-slate-500 italic"
                 )}>
-                    {eventData.title || "Brak tytułu"}
+                    {eventData.price ? formatPrice(eventData.price) : "Brak ceny"}
                 </p>
             )}
             {isEditing && (
                 <Form {...form}>
                     <form
                     onSubmit={form.handleSubmit(handleSubmit)}
-                    className="space-y-4 mt-4">
+                    className="space-y-4 mt-4"
+                    >
                         <FormField
-                        control={form.control}
-                        name="title"
-                        render={({field})=>(
-                            <FormItem>
-                                <FormControl>
-                                    <Input
-                                    disabled={isSubmitting}
-                                    placeholder="np. 'Baltic Cup'"
-                                    {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
+                            control={form.control}
+                            name="price"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Input
+                                        type="number"
+                                        step="0.01"
+                                        disabled={isSubmitting}
+                                        placeholder="np. 20"
+                                        {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
                         )}
                         />
                         <div className="flex items-center gap-x-2">
@@ -130,4 +130,4 @@ export const TitleForm = ({
     )
 }
  
-export default TitleForm;
+export default PriceForm;

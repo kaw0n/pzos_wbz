@@ -32,3 +32,41 @@ export async function PATCH(
         return new NextResponse("Wewnętrzny błąd serwera", {status:500})
     }
 }
+
+export async function DELETE(
+    req: Request,
+    {params }: {params: {eventId: string}}
+){
+    try {
+        const {userId} = await auth();
+
+        if(!userId) {
+            return new NextResponse("Brak autoryzacji", {status: 401})
+        }
+
+        const course = await db.event.findUnique({
+            where:{
+                id: params.eventId,
+                userId : userId
+            }
+        });
+
+        if(!course) {
+            return new NextResponse("Nie znaleziono", {status : 404})
+        }
+
+        const deletedCourse = await db.event.delete({
+            where:{
+                id: params.eventId
+            }
+        })
+
+        return NextResponse.json(deletedCourse)
+
+
+
+    } catch (error){
+        console.log("[COURSE_ID_DELETE", error)
+        return new NextResponse("Wewnętrzny błąd", {status: 500})
+    }
+}

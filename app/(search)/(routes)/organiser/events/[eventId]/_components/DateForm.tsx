@@ -8,13 +8,13 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, PenLine, PenOff } from "lucide-react";
+import { PenLine, PenOff } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import DatePicker from "./DatePicker";
+import DatePicker from "@/components/DatePicker";
 
 interface DateFormProps {
   eventData: Event;
@@ -55,7 +55,8 @@ export const DateForm = ({ eventData, eventId }: DateFormProps) => {
   return (
     <div
       className={cn(
-        "mt-6 border rounded-full p-10",
+        "mt-6 border rounded-full",
+        isEditing ? "p-10" : "p-6",
         eventData.date ? "bg-green-100" : "bg-gray-100"
       )}
     >

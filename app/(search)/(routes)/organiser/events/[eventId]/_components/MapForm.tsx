@@ -140,8 +140,8 @@ const LocationForm = ({ eventData, eventId }: LocationFormProps) => {
   return (
     <div
       className={cn(
-        "mt-6 border rounded-full p-28",
-        eventData.location ? "bg-green-100 " : "bg-gray-100 mt-6"
+        "mt-6 border rounded-3xl p-6",
+        eventData.location ? "bg-green-100" : "bg-gray-100"
       )}
     >
       <div className="font-md flex items-center justify-between">
@@ -170,9 +170,9 @@ const LocationForm = ({ eventData, eventId }: LocationFormProps) => {
           Brak lokalizacji
         </p>
       )}
-      <div className="space-y-4 mt-2">
+      <div className="space-y-4">
         {isEditing && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-4">
             <Input
               type="text"
               placeholder="Wpisz adres"
@@ -185,7 +185,7 @@ const LocationForm = ({ eventData, eventId }: LocationFormProps) => {
         <MapContainer
           center={[position.lat, position.lng]}
           zoom={12}
-          className="h-80 w-full"
+          className="h-80 w-full rounded-full"
           //@ts-ignore
           whenReady={(mapEvent: L.LeafletEvent) => {
             mapRef.current = mapEvent.target as L.Map;
