@@ -2,11 +2,11 @@
 CREATE TABLE "Event" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
+    "title" TEXT,
     "description" TEXT,
     "imageUrl" TEXT,
-    "location" TEXT,
-    "eventDate" TIMESTAMP(3),
+    "location" JSONB,
+    "date" TIMESTAMP(3),
     "price" DOUBLE PRECISION,
     "isPublic" BOOLEAN NOT NULL DEFAULT false,
     "categoryId" TEXT,
@@ -17,7 +17,7 @@ CREATE TABLE "Event" (
 );
 
 -- CreateTable
-CREATE TABLE "Attachment" (
+CREATE TABLE "File" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "url" TEXT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE "Attachment" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Attachment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "File_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -40,7 +40,7 @@ CREATE TABLE "Category" (
 CREATE INDEX "Event_categoryId_idx" ON "Event"("categoryId");
 
 -- CreateIndex
-CREATE INDEX "Attachment_eventId_idx" ON "Attachment"("eventId");
+CREATE INDEX "File_eventId_idx" ON "File"("eventId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
@@ -49,4 +49,4 @@ CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
 ALTER TABLE "Event" ADD CONSTRAINT "Event_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Attachment" ADD CONSTRAINT "Attachment_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "File" ADD CONSTRAINT "File_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE CASCADE ON UPDATE CASCADE;
