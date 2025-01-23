@@ -11,8 +11,8 @@ import dynamic from "next/dynamic";
 import CategoryForm from "./_components/CategoryForm";
 import PriceForm from "./_components/PriceForm";
 import FilesForm from "./_components/FilesForm";
-import  PublishAction  from "./_components/PublishAction";
-import DeleteAction from "./_components/DeleteAction";
+import  PublishAction  from "./_components/actions/PublishAction";
+import DeleteAction from "./_components/actions/DeleteAction";
 const MapForm = dynamic(() => import('./_components/MapForm'), { ssr: false });
 
 
@@ -115,10 +115,6 @@ const EventIdPage = async({
                     eventData={event}
                     eventId={event.id}
                     />
-                    <MapForm
-                    eventData={event}
-                    eventId={event.id}
-                    />
                     <ImageForm
                     eventData={event}
                     eventId={event.id}
@@ -136,6 +132,10 @@ const EventIdPage = async({
                     eventId={event.id}
                     />
                     <FilesForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <MapForm
                     eventData={event}
                     eventId={event.id}
                     />

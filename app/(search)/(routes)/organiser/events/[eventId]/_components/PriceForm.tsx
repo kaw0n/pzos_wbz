@@ -65,6 +65,7 @@ export const PriceForm = ({
     return(
         <div className={cn(
                 "mt-6 border rounded-full p-6",
+                isEditing ? "p-10" : "p-6",
                 eventData.price ? "bg-green-100" : "bg-gray-100"
               )}>
             <div className="font-md flex items-center justify-between">

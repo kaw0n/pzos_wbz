@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FileIcon, FilePlus, LoaderCircle, PenOff, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Uploader from "@/components/Uploader";
+import FileNameForm from "./FileNameForm";
 
 interface FilesFormProps {
   eventData: Event & { files: File[] };
@@ -96,11 +97,11 @@ export const FilesForm = ({
                 {eventData.files.map((file) => (
                     <div
                     key={file.id}
-                    className="flex items-center p-3 mt-4 w-full bg-green-200  border text-green-600 rounded-full"
+                    className="flex items-center p-3 mt-4 w-full bg-green-200  border  rounded-full"
                     >
-                        <FileIcon className="h-4 w-4 mr-2 flex-shrink-0"/>
-                        <p className="text-xs line-clamp-1">
-                            {file.name}
+                        <FileIcon className="h-4 w-4 mr-2 flex-shrink-0 text-green-600"/>
+                        <p className="text-xs line-clamp-1 text-green-600">
+                            {file.visibleName ? file.visibleName : file.name}
                         </p>
                         {deleting === file.id &&(
                             <div>
@@ -116,6 +117,10 @@ export const FilesForm = ({
                                 <Trash2 className="h-4 w-4 "/>
                             </Button>
                         )}
+                        <FileNameForm
+                        eventId={eventId}
+                        fileId={file.id}
+                        />
                     </div>
                 ))}
             </div>

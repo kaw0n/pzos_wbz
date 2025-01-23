@@ -20,28 +20,24 @@ import { PenLine, PenOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface TitleFormProps{
-    eventData: Event
+interface FileNameFormProps{
+    fileId: string;
     eventId: string;
     
 }
 
 const formSchema = z.object({
-    title: z.string().min(1, {
-        message:" Nazwa jest wymagana"
+    visibleName: z.string().min(1, {
     })
 })
 
-export const TitleForm = ({
-    eventData,
-    eventId
-}: TitleFormProps) =>{
+export const FileNameForm = ({
+    eventId,
+    fileId
+}: FileNameFormProps) =>{
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues : {
-            title: eventData?.title || ""
-        },
     });
 
     const { isSubmitting, isValid} = form.formState;
@@ -55,8 +51,8 @@ export const TitleForm = ({
     
     const handleSubmit = async (values: z.infer<typeof formSchema>) =>{
         try{
-            await axios.patch(`/api/events/${eventId}`, values)
-            toast.success("Wydarzenie zaktualizowane")
+            await axios.patch(`/api/events/${eventId}/files/${fileId}`, values)
+            toast.success("Plik zaktualizowany")
             editingState();
             router.refresh();
         } catch {
@@ -64,51 +60,37 @@ export const TitleForm = ({
         }
     }
     return(
-        <div className={cn(
-            "mt-6 border rounded-full p-6",
-            isEditing ? "p-10" : "p-6",
-            eventData.title ? "bg-green-100" : "bg-gray-100"
-        )}>
+        <div className="flex flex-row">
             <div className="font-medium flex items-center justify-between">
-                Nazwa wydarzenia
-                <Button onClick={editingState} variant="outline" className="rounded-full">
+                <Button onClick={editingState} variant="outline" className="rounded-full ml-2">
                     {isEditing &&(
                         <>
-                            <PenOff className="h-4 w-4 mr-2"/>
-                            Anuluj
+                            <PenOff className="h-4 w-4"/>
                         </>
                     )}
                     {!isEditing &&(
                         <>
-                            <PenLine className="h-4 w-4 mr-2"/>
-                            Edytuj
+                            <PenLine className="h-4 w-4"/>
                         </>
                     )}
                     
                 </Button>
             </div>
-            {!isEditing &&(
-                <p className={cn(
-                    "text-sm mt-2",
-                    !eventData.title && "text-slate-500 italic"
-                )}>
-                    {eventData.title || "Brak tytułu"}
-                </p>
-            )}
             {isEditing && (
+                <div className="">
                 <Form {...form}>
                     <form
                     onSubmit={form.handleSubmit(handleSubmit)}
-                    className="space-y-4 mt-4">
+                    className="ml-4 space-x-4 flex flex-row">
                         <FormField
                         control={form.control}
-                        name="title"
+                        name="visibleName"
                         render={({field})=>(
                             <FormItem>
                                 <FormControl>
                                     <Input
                                     disabled={isSubmitting}
-                                    placeholder="np. 'Baltic Cup'"
+                                    placeholder="np. 'Wyniki Etap 1'"
                                     {...field}
                                     />
                                 </FormControl>
@@ -118,6 +100,7 @@ export const TitleForm = ({
                         />
                         <div className="flex items-center gap-x-2">
                             <Button
+                            className="rounded-full"
                             disabled={!isValid || isSubmitting}
                             type="submit"
                             >
@@ -126,9 +109,10 @@ export const TitleForm = ({
                         </div>
                     </form>
                 </Form>
+                </div>
             )}
         </div>
     )
 }
  
-export default TitleForm;
+export default FileNameForm;

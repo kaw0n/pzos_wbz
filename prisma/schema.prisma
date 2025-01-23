@@ -19,14 +19,15 @@ model Event {
   title       String?   @db.Text
   description String?   @db.Text
   imageUrl    String?   @db.Text
-  location    Json? //lokalozacja
-  date        DateTime? //data wydarzenia
+  location    Json?
+  date        DateTime?
   price       Float?
   isPublic    Boolean   @default(false)
+  categoryId  String?
 
-  categoryId String?
-
-  files File[]
+  ageCategories AgeCategory[]
+  files         File[]
+  conmetitors   Competitor[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,9 +38,10 @@ model Event {
 }
 
 model File {
-  id   String @id @default(uuid())
-  name String
-  url  String @db.Text
+  id          String  @id @default(uuid())
+  name        String
+  url         String  @db.Text
+  visibleName String?
 
   eventId String
   event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -54,4 +56,37 @@ model Category {
   id     String  @id @default(uuid())
   name   String  @unique
   events Event[]
+}
+
+model Competitor {
+  id            String @id @default(uuid())
+  name          String
+  surname       String
+  chip          Int
+  ageCategoryId String
+  eventId       String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ageCategory AgeCategory? @relation(fields: [ageCategoryId], references: [id])
+
+  @@index([eventId])
+  @@index([ageCategoryId])
+}
+
+model AgeCategory {
+  id   String @id @default(uuid())
+  name String
+
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  competitors Competitor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
 }
