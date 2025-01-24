@@ -13,6 +13,7 @@ import PriceForm from "./_components/PriceForm";
 import FilesForm from "./_components/FilesForm";
 import  PublishAction  from "./_components/actions/PublishAction";
 import DeleteAction from "./_components/actions/DeleteAction";
+import AgeCategoryForm from "./_components/AgeCategoryForm";
 const MapForm = dynamic(() => import('./_components/MapForm'), { ssr: false });
 
 
@@ -41,6 +42,11 @@ const EventIdPage = async({
                 orderBy: {
                     createdAt: "desc"
                 }
+            },
+            ageCategories:{
+                orderBy: {
+                    createdAt: "desc"
+                }
             }
         }
     })
@@ -61,6 +67,7 @@ const EventIdPage = async({
         event.date,
         event.price,
         event.categoryId,
+        event.ageCategories,
     ];
 
     const categories = await db.category.findMany({
@@ -128,6 +135,10 @@ const EventIdPage = async({
                     }))}
                     />
                     <PriceForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <AgeCategoryForm
                     eventData={event}
                     eventId={event.id}
                     />

@@ -1,24 +1,23 @@
 "use client";
 
-import { Event, File } from "@prisma/client";
+import { AgeCategory, Event } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { FileIcon, FilePlus, LoaderCircle, PenOff, Trash2 } from "lucide-react";
+import { CircleDot, FilePlus, LoaderCircle, PenOff, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Uploader from "@/components/Uploader";
-import FileNameForm from "./FileNameForm";
+import AgeCateforyNameForm from "./AgeCategoryNameForm";
 
 interface FilesFormProps {
-  eventData: Event & { files: File[] };
+  eventData: Event & { ageCategories: AgeCategory[] };
   eventId: string;
 }
 
 const formSchema = z.object({
-  url: z.string().min(1),
+  name: z.string().min(1),
 });
 
 export const FilesForm = ({
@@ -35,9 +34,8 @@ export const FilesForm = ({
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post(`/api/events/${eventId}/files`, values);
+      await axios.post(`/api/events/${eventId}/ageCategories`, values);
       toast.success("Wydarzenie zaktualizowane");
-      editingState();
       router.refresh();
     } catch {
       toast.error("Coś poszło nie tak");
@@ -47,8 +45,8 @@ export const FilesForm = ({
   const handleDelete = async (id: string) => {
     try{
         setDeleting(id)
-        await axios.delete(`/api/events/${eventId}/files/${id}`)
-        toast.success("Plik usunięty")
+        await axios.delete(`/api/events/${eventId}/ageCategories/${id}`)
+        toast.success("Kategoria usunięta")
         router.refresh()
 
     }catch(error){
@@ -59,24 +57,19 @@ export const FilesForm = ({
     }
   }
 
-  
 
   return (
     <div
       className={cn(
         "mt-6 border rounded-3xl p-6",
-        eventData.files.length===0 ? "bg-gray-100" : "bg-green-100"
+        eventData.ageCategories.length===0 ? "bg-gray-100" : "bg-green-100"
       )}
     >
       <div className="font-md flex items-center justify-between">
-        Pliki
-        <Button onClick={editingState} variant="outline" className="rounded-full">
-          {isEditing && (
-            <>
-              <PenOff className="h-4 w-4 mr-2" />
-              Anuluj
-            </>
-          )}
+        Kategorie
+        <Button onClick={async () => {
+    await handleSubmit({name: ""});
+  }} variant="outline" className="rounded-full">
           {!isEditing && (
             <>
               <FilePlus className="h-4 w-4 mr-2" />
@@ -87,57 +80,45 @@ export const FilesForm = ({
       </div>
       {!isEditing && (
         <>
-            {eventData.files.length === 0 && (
+            {eventData.ageCategories.length === 0 && (
                 <p className="text-sm mt-2 text-slate-500 italic">
-                    Brak plików
+                    Brak kategorii
                 </p>
             )}
-            {eventData.files.length > 0 && (
+            {eventData.ageCategories.length > 0 && (
                 <div className="space-y-2">
-                {eventData.files.map((file) => (
+                {eventData.ageCategories.map((ageCategory) => (
                     <div
-                    key={file.id}
+                    key={ageCategory.id}
                     className="flex items-center p-3 mt-4 w-full bg-green-200  border  rounded-full"
                     >
-                        <FileIcon className="h-4 w-4 mr-2 flex-shrink-0 text-green-600"/>
+                        <CircleDot className="h-4 w-4 mr-2 flex-shrink-0 text-green-600"/>
                         <p className="text-xs line-clamp-1 text-green-600">
-                            {file.visibleName ? file.visibleName : file.name}
+                            {ageCategory.name}
                         </p>
-                        {deleting === file.id &&(
+                        {deleting === ageCategory.id &&(
                             <div>
                                 <LoaderCircle className="h-4 w-4 animate-spin"/>
                             </div>
                         )}
-                        {deleting !== file.id &&(
+                        {deleting !== ageCategory.id &&(
                             <Button
                             className="ml-auto hover:opacity-75 hover:border-red-600 hover:text-red-600 hover:bg-red-100 border-2 transition rounded-full "
                             variant="outline"
-                            onClick={()=>handleDelete(file.id)}
+                            onClick={()=>handleDelete(ageCategory.id)}
                             >
                                 <Trash2 className="h-4 w-4 "/>
                             </Button>
                         )}
-                        <FileNameForm
+                        <AgeCateforyNameForm
                         eventId={eventId}
-                        fileId={file.id}
+                        ageCategoryId={ageCategory.id}
                         />
                     </div>
                 ))}
             </div>
             )}
         </>
-      )}
-      {isEditing && (
-        <div className="h-60 w-full">
-          <Uploader
-            endpoint="eventFile"
-            onChange={(url) => {
-              if (url) {
-                handleSubmit({ url : url  });
-              }
-            }}
-          />
-        </div>
       )}
     </div>
   );
