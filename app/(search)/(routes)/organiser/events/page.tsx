@@ -1,40 +1,33 @@
-"use client"
 
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
+import OrganiserClientPage from "./_components/OgraniserClientPage";
+import { DataTable } from "./_components/DataTable";
+import { columns } from "./_components/Columns";
 
 
+const OrganiserPage = async () => {
+  const { userId } = await auth();
 
-const isOrganiserPage = () => {
+  if (!userId) {
+    return redirect("/");
+  }
 
-    const router = useRouter()
-    const {userId} =  useAuth()
+  const events = await db.event.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
 
-    const handleCreateEvent = async () => {
-        try {
-            const response = 
-            await axios.post('/api/events', {userId})
-            router.push(`/organiser/events/${response.data.id}`)
-            toast.success('Wydarzenie zostało utworzone')
-        } catch (error) {
-            toast.error('Coś poszło nie tak')
-        }
-    }
-    
-    return ( 
+  return (
+    <div >
+        <OrganiserClientPage />
         <div className="p-6">
-            <Button
-            onClick={handleCreateEvent}
-            >
-                Nowe wydarzenie
-            </Button>
+            <DataTable columns={columns} data={events}/>
         </div>
-        
-        
-     );
-}
- 
-export default isOrganiserPage;
+
+    </div>
+  )
+};
+
+export default OrganiserPage;

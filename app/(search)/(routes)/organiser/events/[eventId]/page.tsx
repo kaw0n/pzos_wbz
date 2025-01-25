@@ -67,7 +67,7 @@ const EventIdPage = async({
         event.date,
         event.price,
         event.categoryId,
-        event.ageCategories,
+        event.ageCategories.length>0,
     ];
 
     const categories = await db.category.findMany({

@@ -20,7 +20,7 @@ const DatePicker = ({ field }: { field: any }) => {
         <Button
           variant={"outline"}
           className={cn(
-            "mt-2 w-full justify-start text-left font-normal",
+            "mt-2 w-full justify-start text-left font-normal rounded-full",
             !field.value && "text-muted-foreground",
           )}
         >
@@ -28,7 +28,7 @@ const DatePicker = ({ field }: { field: any }) => {
           {field.value ? (
             format(field.value, "PPP")
           ) : (
-            <span>Wybierz datę wydarzenia</span>
+            <span>Wybierz datę</span>
           )}
         </Button>
       </PopoverTrigger>
