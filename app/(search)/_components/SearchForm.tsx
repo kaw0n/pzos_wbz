@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { useSearchParams, usePathname,useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import qs from "query-string"
+import { cn } from "@/lib/utils";
 
 const SearchForm = () => {
 
@@ -41,7 +42,13 @@ const SearchForm = () => {
         <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="pl-10 rounded-full hover:ring-green-600 hover:bg-green-100 focus-visible:ring-green-600 focus:bg-green-100 transition"
+        className={cn(
+          "pl-10 rounded-full transition", // Dodajemy ring-2 dla wyraźniejszego obramowania
+          value 
+            ? "bg-green-100 focus-visible:ring-green-600 border-green-600" // Stały zielony ring
+            : "hover:ring-green-600 hover:bg-green-100 focus-visible:ring-green-600 focus:bg-green-100"
+        )}
+        
         placeholder="Szukaj..."
         />
       </div>

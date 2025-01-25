@@ -15,7 +15,7 @@ const Navbar = () => {
         bg-white
         shadow-sm
         ">  
-            <div className="hidden md:flex w-[250px] md:pr-6">
+            <div className="hidden md:flex w-[200px] pr-6 pl-6">
                 <Logo/>
             </div>
             <div className="hidden md:flex w-full">

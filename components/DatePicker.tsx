@@ -13,7 +13,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const DatePicker = ({ field }: { field: any }) => {
+const DatePicker = ({
+  field,
+  onClick,
+  className,
+}: {
+  field: any;
+  onClick?: () => void; // Nowy prop onClick
+  className?: string;
+}) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,9 +30,11 @@ const DatePicker = ({ field }: { field: any }) => {
           className={cn(
             "mt-2 w-full justify-start text-left font-normal rounded-full",
             !field.value && "text-muted-foreground",
+            className
           )}
+          onClick={onClick} // Obsługa resetowania daty po kliknięciu
         >
-          <CalendarIcon className="mr-2 h-4 w-4 " />
+          <CalendarIcon className="mr-2 h-4 w-4" />
           {field.value ? (
             format(field.value, "PPP")
           ) : (
