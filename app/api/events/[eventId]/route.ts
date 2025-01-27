@@ -66,7 +66,7 @@ export async function DELETE(
 
 
     } catch (error){
-        console.log("[COURSE_ID_DELETE", error)
+        console.log("[EVENT_ID_DELETE", error)
         return new NextResponse("Wewnętrzny błąd", {status: 500})
     }
 }

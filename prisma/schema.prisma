@@ -27,7 +27,8 @@ model Event {
 
   ageCategories AgeCategory[]
   files         File[]
-  conmetitors   Competitor[] //poprawić nazwę
+  competitors   Competitor[]
+  enrollments   Enroll[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,12 +60,14 @@ model Category {
 }
 
 model Competitor {
-  id            String @id @default(uuid())
+  id            String  @id @default(uuid())
   name          String
   surname       String
   chip          Int
   ageCategoryId String
   eventId       String
+  enrollId      String
+  enroll        Enroll? @relation(fields: [enrollId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,6 +90,21 @@ model AgeCategory {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model Enroll {
+  id      String @id @default(uuid())
+  eventId String
+  userId  String
+
+  competitors Competitor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
 }

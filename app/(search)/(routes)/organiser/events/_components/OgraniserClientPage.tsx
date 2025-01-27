@@ -29,8 +29,8 @@ const OrganiserClientPage = () => {
       };
     return ( 
         <div className="ml-6 mt-6">
-              <Button onClick={handleCreateEvent}>Nowe wydarzenie</Button>
-            </div>
+          <Button onClick={handleCreateEvent}>Nowe wydarzenie</Button>
+        </div>
      );
 };
 

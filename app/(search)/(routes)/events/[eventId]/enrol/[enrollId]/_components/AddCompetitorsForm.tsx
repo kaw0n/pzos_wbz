@@ -9,9 +9,8 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { CircleDot, FilePlus, LoaderCircle, PenOff, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import AgeCateforyNameForm from "./AgeCategoryNameForm";
 
-interface AgeCategoriesFormProps {
+interface FilesFormProps {
   eventData: Event & { ageCategories: AgeCategory[] };
   eventId: string;
 }
@@ -20,10 +19,10 @@ const formSchema = z.object({
   name: z.string().min(1),
 });
 
-export const AgeCategoriesForm = ({
+export const FilesForm = ({
   eventData,
   eventId,
-}: AgeCategoriesFormProps) => {
+}: FilesFormProps) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -110,10 +109,6 @@ export const AgeCategoriesForm = ({
                                 <Trash2 className="h-4 w-4 "/>
                             </Button>
                         )}
-                        <AgeCateforyNameForm
-                        eventId={eventId}
-                        ageCategoryId={ageCategory.id}
-                        />
                     </div>
                 ))}
             </div>
@@ -124,4 +119,4 @@ export const AgeCategoriesForm = ({
   );
 };
 
-export default AgeCategoriesForm;
+export default FilesForm;
