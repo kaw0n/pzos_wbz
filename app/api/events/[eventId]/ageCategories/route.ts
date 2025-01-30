@@ -8,6 +8,7 @@ export async function POST(
 ) {
     try{
         const { userId } = await auth();
+        const values = await req.json();
 
         if(!userId){
             return new NextResponse('Brak autoryzacji', { status: 401 });
@@ -27,6 +28,7 @@ export async function POST(
         const ageCategory = await db.ageCategory.create({
             data: {
                 eventId: params.eventId,
+                ...values
             }
         })
 

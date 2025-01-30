@@ -81,8 +81,8 @@ model Competitor {
 }
 
 model AgeCategory {
-  id   String  @id @default(uuid())
-  name String?
+  id   String @id @default(uuid())
+  name String
 
   eventId String
   event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)

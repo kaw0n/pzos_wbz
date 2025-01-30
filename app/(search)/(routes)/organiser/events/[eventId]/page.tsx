@@ -122,10 +122,6 @@ const EventIdPage = async({
                     eventData={event}
                     eventId={event.id}
                     />
-                    <ImageForm
-                    eventData={event}
-                    eventId={event.id}
-                    />
                     <CategoryForm
                     eventData={event}
                     eventId={event.id}
@@ -143,6 +139,10 @@ const EventIdPage = async({
                     eventId={event.id}
                     />
                     <FilesForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
+                    <ImageForm
                     eventData={event}
                     eventId={event.id}
                     />
