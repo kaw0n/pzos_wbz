@@ -61,22 +61,23 @@ model Category {
 
 model Competitor {
   id            String  @id @default(uuid())
-  name          String
-  surname       String
-  chip          Int
-  ageCategoryId String
+  name          String?
+  surname       String?
+  chip          Int?
+  ageCategoryId String?
   eventId       String
   enrollId      String
-  enroll        Enroll? @relation(fields: [enrollId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   ageCategory AgeCategory? @relation(fields: [ageCategoryId], references: [id])
+  enroll      Enroll       @relation(fields: [enrollId], references: [id], onDelete: Cascade)
 
   @@index([eventId])
   @@index([ageCategoryId])
+  @@index([enrollId])
 }
 
 model AgeCategory {

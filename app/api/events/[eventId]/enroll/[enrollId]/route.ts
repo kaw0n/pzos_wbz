@@ -8,27 +8,28 @@ export async function PATCH(
 ) {
     try {
         const { userId} = await auth()
+        const {eventId} = params
+        const {enrollId} = params
         const {...values} = await req.json()
 
         if (!userId) {
             return new NextResponse("Brak autoryzacji", {status: 401})
         }
 
-        const ownEnroll = await db.enroll.findUnique({
+        const event = await db.event.findUnique({
             where:{
-                id: params.eventId,
-                userId
+                id: eventId,
             }
         })
 
-        if (!ownEnroll) {
+        if (!event) {
             return new NextResponse("Brak autoryzacji", {status: 401})
         }
 
         const enroll = await db.enroll.update({
             where:{
-                id: params.enrollId,
-                eventId: params.eventId
+                id: enrollId,
+                userId: userId
             },
             data:{
                 ...values,
@@ -38,7 +39,7 @@ export async function PATCH(
         return  NextResponse.json(enroll)
 
     } catch (error){
-        console.log("[EVENT_CATEGORY_ID", error)
+        console.log("[ENROLL_ID", error)
         return new NextResponse("Wewnętrzny błąd", {status : 500})
     }
 }

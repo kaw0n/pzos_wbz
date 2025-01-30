@@ -1,58 +1,65 @@
-"use client"
+import { redirect } from "next/navigation";
+import AddCompetitorsForm from "./_components/AddCompetitorsForm";
+import { auth } from "@clerk/nextjs/server";
+import DeleteEnroll from "./_components/DeleteEnroll";
+import { db } from "@/lib/db";
+import SaveEnroll from "./_components/SaveEnroll";
 
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@clerk/nextjs";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import toast from "react-hot-toast";
-
-// Definicja interfejsu Params
 interface Params {
     eventId: string;
     enrollId: string;
 }
 
-// Przekazanie interfejsu do props komponentu
-const EnrollmenPage = ({ params }: { params: Params }) => {
+const EnrollmentPage = async ({ params }: { params: Params }) => {
 
-    const [deleting, setDeleting] = useState<string | null>(null);
+    
 
-    const { userId } = useAuth();
-    const router = useRouter();
+    const { userId } = await auth();
+    
 
     if (!userId) {
-        router.push('/');
+        return redirect('/');
     }
 
     if (!params.enrollId) {
-        router.push(`/events/${params.eventId}`)
+        return redirect(`/events/${params.eventId}`)
     }
 
-    const handleDelete = async (id: string) => {
-        try {
-            setDeleting(id)
-            await axios.delete(`/api/events/${params.eventId}/enroll/${params.enrollId}`)
-            toast.success("Pomyślnie przerwano")
-            router.push(`/events/${params.eventId}`)
-
-        } catch (error) {
-            console.log(error)
-            toast.error("Coś poszło nie tak")
-        } finally {
-            setDeleting(null)
+    const enroll = await db.enroll.findUnique({
+        where: {
+            id: params.enrollId,
+            eventId: params.eventId
+        },
+        include: {
+            competitors: {
+                orderBy: {
+                    createdAt: "desc"
+                }
+            }
         }
+    })
+
+    if (!enroll) {
+        return redirect(`/events/${params.eventId}`);
     }
 
     return (
         <div>
-            <Button
-                onClick={() => handleDelete(params.enrollId)}>
-                Wyjdź
-            </Button>
-            EnrolmentId: {params.enrollId}
+            <DeleteEnroll params={params} />
+            EnrolmentId: {enroll.id}
+            <AddCompetitorsForm
+            enrollData={enroll}
+            enrollId={enroll.id} 
+            eventId={enroll.eventId} />
+            <SaveEnroll 
+            enrollData={enroll} 
+            enrollId={enroll.id} 
+            eventId={enroll.eventId}
+            
+            
+            />
         </div>
     );
 }
 
-export default EnrollmenPage;
+export default EnrollmentPage;

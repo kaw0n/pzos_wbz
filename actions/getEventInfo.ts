@@ -20,6 +20,12 @@ export const getEventInfo = async ({
                 imageUrl: true,
                 location: true,
                 price: true,
+                enrollments: true,
+                ageCategories: {
+                    include: {
+                        competitors: true,
+                    },
+                },
             },
         });
 
@@ -36,7 +42,10 @@ export const getEventInfo = async ({
         const competitors = await db.competitor.findMany({
             where: {
                 eventId: eventId,
-            },
+            },include: {
+                ageCategory: true,
+                
+            }
         });
 
         return {
