@@ -57,7 +57,7 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
           <ul className="space-y-4">
             {event.ageCategories.map((ageCategory) => (
               <li key={ageCategory.id} className="p-3 bg-gray-100 border rounded-md shadow-sm">
-                <h3 className="text-lg font-semibold">Kategoria: {ageCategory.name}</h3>
+                <h3 className="text-lg font-semibold">{ageCategory.name}</h3>
                 {ageCategory.competitors.length > 0 ? (
                   <ul className="mt-2 space-y-2">
                     {ageCategory.competitors.map((competitor) => (
@@ -77,7 +77,10 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
         </div>
       )}
 
-      <EnrollButton eventId={params.eventId} />
+      <EnrollButton 
+      eventId={params.eventId}
+      eventDate={event.date}
+      />
     </div>
   );
 };

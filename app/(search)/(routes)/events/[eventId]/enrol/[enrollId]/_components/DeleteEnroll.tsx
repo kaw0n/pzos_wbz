@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { DoorOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -31,10 +32,16 @@ const DeleteEnroll = ({ params }: { params: Params }) => {
             }
         }
     return ( 
-        <Button
-        onClick={() => handleDelete(params.enrollId)}>
-            Wyjdź
-        </Button>
+        <div className="flex p-6">
+            <Button
+            variant="outline"
+            className="rounded-full hover:opacity-75 hover:border-red-600 hover:text-red-600 hover:bg-red-100"
+            onClick={() => handleDelete(params.enrollId)}>
+                <DoorOpen className="h-4 w-4"/>
+                Wyjdź
+            </Button>
+        </div>
+        
      );
 }
  

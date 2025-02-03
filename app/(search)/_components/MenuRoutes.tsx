@@ -1,6 +1,6 @@
 "use client"
 
-import { CircleUserRound, Compass, DollarSign, LayoutList } from "lucide-react";
+import { CircleUserRound, Compass, LayoutList, Users } from "lucide-react";
 import MenuItem from "./MenuItem";
 import { usePathname } from "next/navigation";
 
@@ -24,9 +24,9 @@ const organiserRoutes = [
         href:"/organiser/events"
     },
     {
-        icon: DollarSign,
-        label: "Przychody",
-        href:"/organiser/income"
+        icon: Users,
+        label: "Zapisani zawodnicy",
+        href:"/organiser/competitors"
     },
 ]
 

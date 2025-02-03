@@ -55,7 +55,7 @@ export const ImageForm = ({
       )}
     >
       <div className="font-md flex items-center justify-between">
-        Tło wydarzenia
+        Miniaturka wydarzenia
         <Button onClick={editingState} variant="outline" className="rounded-full">
           {isEditing && (
             <>

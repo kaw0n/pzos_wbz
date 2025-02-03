@@ -54,20 +54,13 @@ export async function DELETE(
             return new NextResponse("Brak autoryzacji", {status:401})
         }
 
-        const eventOrganiser = await db.event.findUnique({
-            where:{
-                id: params.eventId,
-                userId: userId
-            }
-        })
-        if(!eventOrganiser){
-            return new NextResponse("Brak autoryzacji", {status:401})
-        }
+
 
         const enroll = await db.enroll.delete({
             where:{
                 eventId: params.eventId,
-                id: params.enrollId
+                id: params.enrollId,
+                userId: userId
             }
         })
         return NextResponse.json(enroll)

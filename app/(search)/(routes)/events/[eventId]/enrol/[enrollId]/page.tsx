@@ -24,6 +24,14 @@ const EnrollmentPage = async ({ params }: { params: Params }) => {
     if (!params.enrollId) {
         return redirect(`/events/${params.eventId}`)
     }
+    const event = await db.event.findUnique({
+        where:{
+            id: params.eventId
+        }
+    })
+    if(!event){
+        return redirect(`/`)
+    }
 
     const enroll = await db.enroll.findUnique({
         where: {
@@ -34,10 +42,20 @@ const EnrollmentPage = async ({ params }: { params: Params }) => {
             competitors: {
                 orderBy: {
                     createdAt: "desc"
+                },
+                include: {
+                    ageCategory: true
                 }
             }
         }
     })
+
+    const ageCategories = await db.ageCategory.findMany({
+        orderBy: {
+            name: "asc",
+        },
+    })
+    
 
     if (!enroll) {
         return redirect(`/events/${params.eventId}`);
@@ -45,18 +63,26 @@ const EnrollmentPage = async ({ params }: { params: Params }) => {
 
     return (
         <div>
+            <div className="p-4 text-3xl justify-between items-center">
+                Zapisz się na wydarzenie: {event.title}
+            </div>
             <DeleteEnroll params={params} />
-            EnrolmentId: {enroll.id}
             <AddCompetitorsForm
             enrollData={enroll}
-            enrollId={enroll.id} 
-            eventId={enroll.eventId} />
+            eventId={enroll.eventId}
+            enrollId={enroll.id}
+            ageCategories={ageCategories
+                .filter((category) => category.eventId === enroll.eventId)
+                .map((category)=>({
+                label: category.name,
+                value: category.id,
+                eventId: category.eventId
+            }))}
+            />
             <SaveEnroll 
-            enrollData={enroll} 
             enrollId={enroll.id} 
             eventId={enroll.eventId}
-            
-            
+            competitors={enroll.competitors}
             />
         </div>
     );

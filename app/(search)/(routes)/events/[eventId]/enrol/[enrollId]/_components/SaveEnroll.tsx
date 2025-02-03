@@ -8,15 +8,15 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface SaveEnrollProps {
-    enrollData: Enroll & { competitors: Competitor[] };
     eventId: string;
     enrollId: string;
+    competitors: Competitor[];
 }
 
 const SaveEnroll = ({ 
-    enrollData,
     eventId,
-    enrollId
+    enrollId,
+    competitors
 
 }:SaveEnrollProps) => {
 
@@ -38,10 +38,16 @@ const SaveEnroll = ({
             }
         }
     return ( 
-        <Button
-        onClick={() => handleUpdate(enrollId)}>
+        <div className="flex justify-end p-10">
+            <Button
+            disabled={competitors.length === 0}
+            variant="outline"
+            className="rounded-full hover:opacity-75 hover:border-green-600 hover:text-green-600 hover:bg-green-100"
+            onClick={() => handleUpdate(enrollId)}>
             Wyślij zgłoszenie
         </Button>
+        </div>
+        
      );
 }
  

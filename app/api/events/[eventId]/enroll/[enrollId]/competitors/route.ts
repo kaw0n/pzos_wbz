@@ -8,6 +8,7 @@ export async function POST(
 ) {
     try{
         const { userId } = await auth();
+        const values = await req.json();
 
         if(!userId){
             return new NextResponse('Brak autoryzacji', { status: 401 });
@@ -27,6 +28,13 @@ export async function POST(
             where: {
                 id: params.enrollId,
                 userId: userId
+            },
+            include: {
+                competitors: {
+                    include: {
+                        ageCategory: true,
+                    }
+                }
             }
         })
 
@@ -34,10 +42,22 @@ export async function POST(
             return new NextResponse("Brak dostępu", {status: 403})
         }
 
+        const existingCompetitor = await db.competitor.findFirst({
+            where: {
+              eventId: params.eventId,
+              chip: values.chip
+            }
+        });
+
+        if (existingCompetitor) {
+            return new NextResponse("Zawodnik z tym numerem chip już istnieje w tym wydarzeniu", { status: 400 });
+        }
+
         const competitor = await db.competitor.create({
             data: {
                 enrollId: params.enrollId,
-                eventId: params.eventId
+                eventId: params.eventId,
+                ...values
             }
         })
 
@@ -48,3 +68,4 @@ export async function POST(
         return new NextResponse('Błąd serwera', { status: 500 });
     }
 }
+

@@ -60,21 +60,22 @@ model Category {
 }
 
 model Competitor {
-  id            String  @id @default(uuid())
-  name          String?
-  surname       String?
-  chip          Int?
-  ageCategoryId String?
+  id            String @id @default(uuid())
+  name          String
+  surname       String
+  chip          Int
+  ageCategoryId String
   eventId       String
   enrollId      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ageCategory AgeCategory? @relation(fields: [ageCategoryId], references: [id])
-  enroll      Enroll       @relation(fields: [enrollId], references: [id], onDelete: Cascade)
+  event       Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ageCategory AgeCategory @relation(fields: [ageCategoryId], references: [id])
+  enroll      Enroll      @relation(fields: [enrollId], references: [id], onDelete: Cascade)
 
+  @@unique([eventId, chip], name: "event_chip_unique")
   @@index([eventId])
   @@index([ageCategoryId])
   @@index([enrollId])
