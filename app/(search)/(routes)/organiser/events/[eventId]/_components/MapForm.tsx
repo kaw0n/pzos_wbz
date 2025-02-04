@@ -185,7 +185,7 @@ const LocationForm = ({ eventData, eventId }: LocationFormProps) => {
         <MapContainer
           center={[position.lat, position.lng]}
           zoom={12}
-          className="h-80 w-full rounded-full"
+          className="h-80 w-full rounded-full z-0"
           //@ts-ignore
           whenReady={(mapEvent: L.LeafletEvent) => {
             mapRef.current = mapEvent.target as L.Map;

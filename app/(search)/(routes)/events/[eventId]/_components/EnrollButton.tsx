@@ -6,6 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface EnrollButtonProps {
     eventId: string
@@ -19,6 +20,7 @@ const EnrollButton = ({
     const router = useRouter();
     const { userId } = useAuth();
     const [daysLeft, setDaysLeft] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (eventDate) {
@@ -36,6 +38,7 @@ const EnrollButton = ({
             return;
         }
 
+        setIsLoading(true);
         try {
             const response = await axios.post(`/api/events/${eventId}/enroll`, { userId });
             router.push(`/events/${eventId}/enrol/${response.data.id}`);
@@ -43,6 +46,8 @@ const EnrollButton = ({
         } catch (error) {
             console.error(error);
             toast.error("Coś poszło nie tak");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -52,8 +57,17 @@ const EnrollButton = ({
 
     return (
         <div>
-            <Button onClick={handleCreateEnrollment}>
-                Zapisz się
+            <Button 
+                onClick={handleCreateEnrollment}
+                variant="outline"
+                size="lg"
+                disabled={isLoading}
+                className="rounded-full text-lg bg-green-200 hover:text-green-600 text-green-600 hover:border hover:border-green-600 hover:bg-green-100 transition relative"
+            >
+                {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin absolute left-4" />
+                )}
+                {isLoading ? "Przetwarzanie..." : "Zapisz się"}
             </Button>
         </div>
     );

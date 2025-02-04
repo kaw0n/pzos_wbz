@@ -1,7 +1,9 @@
 import { getEventInfo } from "@/actions/getEventInfo";
-import { File } from "lucide-react";
+import { File, MapPinned } from "lucide-react";
 import dynamic from "next/dynamic";
 import EnrollButton from "./_components/EnrollButton";
+import { Calendar } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const Map = dynamic(() => import("./_components/Map"), { ssr: false });
 
@@ -32,24 +34,58 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
 
   return (
     <div>
-      <div className="flex flex-row gap-x-2">
-        <Map center={[location.lat, location.lng]} />
-        <h1>{new Date(event?.date ?? "").toLocaleDateString()}</h1>
+      <div className="flex justify-center items-center text-3xl text-slate-900 font-semibold p-10 mx-auto max-w-7xl">
+        {event.title}
+      </div>
+      <div className="mt-2 m-6 flex flex-col gap-y-6 md:flex-row md:gap-x-6">
+        <div className="border rounded-3xl p-6 bg-gray-100 h-full w-full flex flex-col">
+          <div className="text-lg mb-4 items-center flex gap-x-2">
+            <MapPinned size={16}/>
+            Lokalizacja
+          </div>
+          <div className="flex h-full">
+            <Map center={[location.lat, location.lng]} />
+          </div>
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${location.lat},${location.lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex items-center justify-center p-2 bg-green-200 text-green-600 rounded-full hover:border hover:border-green-600 hover:bg-green-100 transition"
+          >
+            <MapPinned size={16} className="mr-2"/>
+            <span>Nawiguj</span>
+          </a>
+        </div>
+        <div className=" border rounded-3xl p-6 bg-gray-100 w-full">
+          <div className="flex items-center gap-x-2 mb-4">
+            <Calendar size={16} />
+            {new Date(event?.date ?? "").toLocaleDateString()}
+          </div>
+          <Separator className="mt-5 mb-5"/>
+          <p>{event?.description}</p>
+          <Separator className="mt-5 mb-5"/>
+          <div className="p-2 w-full flex flex-col gap-y-2">
+            {files.map((file) => (
+              <a
+                href={file.url}
+                target="_blank"
+                key={file.id}
+                className="flex items-center p-2 w-full bg-green-200 border text-green-600 rounded-full hover:underline "
+              >
+                <File size={16} className="mr-2"/>
+                <p className="line-clamp-1">{file.visibleName}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-end items-center p-4">
+      <EnrollButton 
+        eventId={params.eventId}
+        eventDate={event.date}
+        />
       </div>
       
-      <div className="p-4">
-        {files.map((file) => (
-          <a
-            href={file.url}
-            target="_blank"
-            key={file.id}
-            className="flex items-center p-3 w-full bg-green-200 border text-green-600 rounded-md hover:underline"
-          >
-            <File />
-            <p className="line-clamp-1">{file.visibleName}</p>
-          </a>
-        ))}
-      </div>
 
       {event?.ageCategories?.length > 0 && (
         <div className="p-4">
@@ -62,8 +98,7 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
                   <ul className="mt-2 space-y-2">
                     {ageCategory.competitors.map((competitor) => (
                       <li key={competitor.id} className="p-2 bg-white border rounded-md">
-                        <p className="text-sm font-medium">Imię: {competitor.name}</p>
-                        <p className="text-sm">Nazwisko: {competitor.surname}</p>
+                        <p className="text-sm font-medium">Imię i nazwizko: {competitor.name} {competitor.surname}</p>
                         <p className="text-sm">Chip: {competitor.chip}</p>
                       </li>
                     ))}
@@ -76,11 +111,6 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
           </ul>
         </div>
       )}
-
-      <EnrollButton 
-      eventId={params.eventId}
-      eventDate={event.date}
-      />
     </div>
   );
 };

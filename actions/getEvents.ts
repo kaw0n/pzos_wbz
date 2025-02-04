@@ -22,7 +22,10 @@ export const getEvents = async ({
     const events = await db.event.findMany({
       where: {
         isPublic: true,
-        title: { contains: title },
+        title: {
+          contains: title,
+          mode: "insensitive"
+        },
         categoryId: categoryId,
         date: {
           gte: startDate ? new Date(startDate) : undefined,

@@ -1,29 +1,35 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Event } from "@prisma/client"
+import { Competitor, Event } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Link, PenLine } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+export type EventWithCompetitors = Event & {
+  competitors: Competitor[];
+};
 
-export const columns: ColumnDef<Event>[] = [
+
+export const columns: ColumnDef<EventWithCompetitors>[] = [
   {
     accessorKey: "title",
     header: "Nazwa",
   },
   {
-    accessorKey: "conmetitors",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Liczba zapisanych uczestników
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
+    accessorKey: "competitors",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Liczba zapisanych uczestników
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const competitorsCount = row.original.competitors.length;
+      return <span>{competitorsCount}</span>;
     },
   },
   {
