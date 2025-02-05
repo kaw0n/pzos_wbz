@@ -26,7 +26,9 @@ const Profile = async () => {
             }
         },
         orderBy: {
-            createdAt: "desc"
+            event: {
+                date: "asc"
+            }
         }
     });
 
@@ -34,12 +36,10 @@ const Profile = async () => {
         enrollments.map(enrollment => [enrollment.event.id, enrollment.event])
     ).values());
 
-    // Get current date and calculate 7 days threshold
     const currentDate = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(currentDate.getDate() - 7);
 
-    // Separate events into incoming and past
     const incomingEvents = uniqueEvents.filter(event => 
         event.date && new Date(event.date) > sevenDaysAgo
     );
