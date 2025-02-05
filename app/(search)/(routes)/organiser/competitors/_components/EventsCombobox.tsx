@@ -1,14 +1,17 @@
 // app/(dashboard)/_components/CompetitorsView.tsx
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { Combobox } from "@/components/Combobox"
 import { DataTable } from "./DataTable"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown, PenLine } from "lucide-react"
+import { ArrowUpDown, PenLine, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { AgeCategory, Competitor } from "@prisma/client"
+import { EditCompetitorsFormOrganiser } from "./AddCompetitorsFormOrganiser"
+import axios from "axios"
+import toast from "react-hot-toast"
 
 type CompetitorWithAgeCategory = Competitor & {
   ageCategory: AgeCategory
@@ -23,33 +26,54 @@ interface EventsComboboxProps {
 }
 
 export const EventsCombobox = ({ events }: EventsComboboxProps) => {
-  const router = useRouter()
-  const [selectedEventId, setSelectedEventId] = useState<string>("")
-  const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("")
+    const router = useRouter()
+    const [selectedEventId, setSelectedEventId] = useState<string>("")
+    const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("")
+    const [deleting, setDeleting] = useState<string | null>(null)
+    const [competitors, setCompetitors] = useState<CompetitorWithAgeCategory[]>([])
+  
+    
+    useEffect(() => {
+      const initialCompetitors = selectedEventId 
+        ? events.find(e => e.id === selectedEventId)?.competitors || []
+        : events.flatMap(event => event.competitors)
+      setCompetitors(initialCompetitors)
+    }, [events, selectedEventId])
+  
+    const ageCategories = useMemo(() => {
+      const categories = new Set<string>()
+      competitors.forEach(competitor => {
+        if (competitor.ageCategory?.name) {
+          categories.add(competitor.ageCategory.name)
+        }
+      })
+      return Array.from(categories).map(cat => ({ label: cat, value: cat }))
+    }, [competitors])
+  
+    const filteredCompetitors = useMemo(() => {
+      return selectedAgeCategory
+        ? competitors.filter(c => c.ageCategory?.name === selectedAgeCategory)
+        : competitors
+    }, [competitors, selectedAgeCategory])
+  
+    const deleteUser = async (id: string) => {
+      try {
+        setDeleting(id)
+        await axios.delete(`/api/competitors/${id}`)
+        
+        setCompetitors(prev => prev.filter(c => c.id !== id))
+        
+        toast.success("Zawodnik usunięty")
+        router.refresh()
+      } catch (error) {
+        console.log(error)
+        toast.error("Coś poszło nie tak")
 
-  const allCompetitors = selectedEventId 
-    ? events.find(e => e.id === selectedEventId)?.competitors || []
-    : events.flatMap(event => event.competitors)
-
-  const ageCategories = useMemo(() => {
-    const categories = new Set<string>()
-    allCompetitors.forEach(competitor => {
-      if (competitor.ageCategory?.name) {
-        categories.add(competitor.ageCategory.name)
+        setCompetitors(prev => [...prev])
+      } finally {
+        setDeleting(null)
       }
-    })
-    return Array.from(categories).map(cat => ({ label: cat, value: cat }))
-  }, [allCompetitors])
-
-  const filteredCompetitors = useMemo(() => {
-    let result = allCompetitors
-    if (selectedAgeCategory) {
-      result = result.filter(competitor => 
-        competitor.ageCategory?.name === selectedAgeCategory
-      )
     }
-    return result
-  }, [allCompetitors, selectedAgeCategory])
 
   const columns: ColumnDef<CompetitorWithAgeCategory>[] = [
     {
@@ -97,16 +121,24 @@ export const EventsCombobox = ({ events }: EventsComboboxProps) => {
     },
     {
       id: "actions",
-      cell: ({ row }) => {
+      cell: ({ row }: { row: any }) => {
         const { id } = row.original
         return (
-          <Button 
+            <div className="flex items-center gap-x-2">
+                <Button 
+                variant="outline" 
+                className="rounded-full" 
+                onClick={() => deleteUser(id)}>
+                    <Trash2 className="h-4 w-4"/>
+                </Button>
+                <Button 
             variant="outline" 
             className="rounded-full" 
-            onClick={() => router.push(`/organiser/events/${id}`)}
-          >
-            <PenLine className="h-4 w-4"/>
-          </Button>
+            onClick={() => {}}>
+              <PenLine className="h-4 w-4"/>
+            </Button>
+            </div>
+            
         )
       }
     }
@@ -125,7 +157,8 @@ export const EventsCombobox = ({ events }: EventsComboboxProps) => {
         onChange={setSelectedEventId}
       />
       
-      <DataTable 
+      <DataTable
+        key={competitors.length} 
         columns={columns} 
         data={filteredCompetitors} 
       />
