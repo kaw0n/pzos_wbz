@@ -39,7 +39,7 @@ export const EventCard = ({
           <div className="my-3 flex items-center gap-x-2 text-sm md:text-xs text-slate-500">
             <div className="flex items-center gap-x-1">
               <Calendar size={16} />
-              <span>{new Date(date).toLocaleDateString()}</span>
+              <span>{new Date(date).toLocaleDateString("pl-PL")}</span>
             </div>
           </div>
           <p className="text-md md:text-sm font-medium text-slate-700">

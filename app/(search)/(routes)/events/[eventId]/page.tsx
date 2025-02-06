@@ -59,7 +59,7 @@ const EventPage = async ({ params }: { params: { eventId: string; title?: string
         <div className=" border rounded-3xl p-6 bg-gray-100 w-full">
           <div className="flex items-center gap-x-2 mb-4">
             <Calendar size={16} />
-            {new Date(event?.date ?? "").toLocaleDateString()}
+            {new Date(event?.date ?? "").toLocaleDateString("pl-PL")}
           </div>
           <Separator className="mt-5 mb-5"/>
           <p>{event?.description}</p>
