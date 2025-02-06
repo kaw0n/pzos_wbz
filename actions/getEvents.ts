@@ -24,7 +24,7 @@ export const getEvents = async ({
         isPublic: true,
         title: {
           contains: title,
-          mode: "insensitive"
+          mode: "insensitive",
         },
         categoryId: categoryId,
         date: {
@@ -41,7 +41,21 @@ export const getEvents = async ({
       },
     });
 
-    return events;
+    const now = new Date();
+    const threshold = new Date(now);
+    threshold.setDate(threshold.getDate() - 3);
+
+    const sortedEvents = events.sort((a, b) => {
+      const aOld = a.date ? new Date(a.date) < threshold : false;
+      const bOld = b.date ? new Date(b.date) < threshold : false;
+
+      if (aOld && !bOld) return 1;
+      if (!aOld && bOld) return -1;
+
+      return (a.date ? new Date(a.date).getTime() : 0) - (b.date ? new Date(b.date).getTime() : 0);
+    });
+
+    return sortedEvents;
   } catch (error) {
     console.error("[GET_EVENTS]", error);
     return [];
