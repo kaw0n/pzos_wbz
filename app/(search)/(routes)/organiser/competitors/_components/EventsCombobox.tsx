@@ -1,4 +1,3 @@
-// app/(dashboard)/_components/CompetitorsView.tsx
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
@@ -22,58 +21,77 @@ interface EventsComboboxProps {
     id: string
     title: string
     competitors: CompetitorWithAgeCategory[]
+    ageCategories: AgeCategory[]
   }[]
 }
 
 export const EventsCombobox = ({ events }: EventsComboboxProps) => {
-    const router = useRouter()
-    const [selectedEventId, setSelectedEventId] = useState<string>("")
-    const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("")
-    const [deleting, setDeleting] = useState<string | null>(null)
-    const [competitors, setCompetitors] = useState<CompetitorWithAgeCategory[]>([])
+  const router = useRouter()
   
-    
-    useEffect(() => {
-      const initialCompetitors = selectedEventId 
-        ? events.find(e => e.id === selectedEventId)?.competitors || []
-        : events.flatMap(event => event.competitors)
-      setCompetitors(initialCompetitors)
-    }, [events, selectedEventId])
-  
-    const ageCategories = useMemo(() => {
-      const categories = new Set<string>()
-      competitors.forEach(competitor => {
-        if (competitor.ageCategory?.name) {
-          categories.add(competitor.ageCategory.name)
-        }
-      })
-      return Array.from(categories).map(cat => ({ label: cat, value: cat }))
-    }, [competitors])
-  
-    const filteredCompetitors = useMemo(() => {
-      return selectedAgeCategory
-        ? competitors.filter(c => c.ageCategory?.name === selectedAgeCategory)
-        : competitors
-    }, [competitors, selectedAgeCategory])
-  
-    const deleteUser = async (id: string) => {
-      try {
-        setDeleting(id)
-        await axios.delete(`/api/competitors/${id}`)
-        
-        setCompetitors(prev => prev.filter(c => c.id !== id))
-        
-        toast.success("Zawodnik usunięty")
-        router.refresh()
-      } catch (error) {
-        console.log(error)
-        toast.error("Coś poszło nie tak")
 
-        setCompetitors(prev => [...prev])
-      } finally {
-        setDeleting(null)
-      }
+  const [selectedEventId, setSelectedEventId] = useState<string>("")
+  const [selectedAgeCategory, setSelectedAgeCategory] = useState<string>("")
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [competitors, setCompetitors] = useState<CompetitorWithAgeCategory[]>([])
+  const [editingCompetitor, setEditingCompetitor] = useState<CompetitorWithAgeCategory | null>(null)
+
+  const handleEditSuccess = (updatedCompetitor: CompetitorWithAgeCategory) => {
+    setCompetitors(prev => 
+      prev.map(c => c.id === updatedCompetitor.id ? updatedCompetitor : c)
+    )
+    setEditingCompetitor(null)
+    router.refresh()
+  }
+
+  useEffect(() => {
+    const initialCompetitors = selectedEventId 
+      ? events.find(e => e.id === selectedEventId)?.competitors || []
+      : events.flatMap(event => event.competitors)
+    setCompetitors(initialCompetitors)
+  }, [events, selectedEventId])
+
+  const eventOptions = events.map(event => ({
+    label: event.title,
+    value: event.id
+  }))
+
+  const ageCategories = useMemo(() => {
+    const event = events.find(e => e.id === selectedEventId);
+    if (!event) return [];
+    
+    return (event.ageCategories ?? []).map(cat => {
+      const hasCompetitors = competitors.some(
+        c => c.ageCategory?.name === cat.name
+      );
+      return {
+        label: hasCompetitors ? cat.name : `${cat.name} (Brak zawodników)`,
+        value: cat.name,
+      };
+    });
+  }, [selectedEventId, events, competitors]);
+  
+  const filteredCompetitors = useMemo(() => {
+    return selectedAgeCategory
+      ? competitors.filter(c => c.ageCategory?.name === selectedAgeCategory)
+      : competitors
+  }, [competitors, selectedAgeCategory])
+
+  const deleteUser = async (id: string) => {
+    try {
+      setDeleting(id)
+      await axios.delete(`/api/competitors/${id}`)
+      
+      setCompetitors(prev => prev.filter(c => c.id !== id))
+      toast.success("Zawodnik usunięty")
+      router.refresh()
+    } catch (error) {
+      console.log(error)
+      toast.error("Coś poszło nie tak")
+      setCompetitors(prev => [...prev])
+    } finally {
+      setDeleting(null)
     }
+  }
 
   const columns: ColumnDef<CompetitorWithAgeCategory>[] = [
     {
@@ -108,46 +126,43 @@ export const EventsCombobox = ({ events }: EventsComboboxProps) => {
       accessorKey: "ageCategory",
       header: () => (
         <div className="flex items-center gap-x-2">
-            Kategoria wiekowa
-            <Combobox
+          Kategoria wiekowa
+          <Combobox
             options={ageCategories}
             value={selectedAgeCategory}
             onChange={setSelectedAgeCategory}
-            />
+          />
         </div>
-        
       ),
       cell: ({ row }) => row.original.ageCategory?.name
     },
     {
       id: "actions",
-      cell: ({ row }: { row: any }) => {
-        const { id } = row.original
+      cell: ({ row }) => {
+        const competitor = row.original
         return (
-            <div className="flex items-center gap-x-2">
-                <Button 
-                variant="outline" 
-                className="rounded-full" 
-                onClick={() => deleteUser(id)}>
-                    <Trash2 className="h-4 w-4"/>
-                </Button>
-                <Button 
-            variant="outline" 
-            className="rounded-full" 
-            onClick={() => {}}>
-              <PenLine className="h-4 w-4"/>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setEditingCompetitor(competitor)}
+              disabled={deleting === competitor.id}
+            >
+              <PenLine className="h-4 w-4" />
             </Button>
-            </div>
-            
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => deleteUser(competitor.id)}
+              disabled={deleting === competitor.id}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         )
       }
     }
   ]
-
-  const eventOptions = events.map(event => ({
-    label: event.title,
-    value: event.id
-  }))
 
   return (
     <div className="p-6 space-y-4">
@@ -156,9 +171,22 @@ export const EventsCombobox = ({ events }: EventsComboboxProps) => {
         value={selectedEventId}
         onChange={setSelectedEventId}
       />
-      
-      <DataTable
-        key={competitors.length} 
+
+      {editingCompetitor && (
+        <EditCompetitorsFormOrganiser
+          key={editingCompetitor.id}
+          competitor={editingCompetitor}
+          ageCategories={events.find(e => e.id === selectedEventId)?.ageCategories || []}
+          id={editingCompetitor.id}
+          onSuccess={(updatedCompetitor) => {
+            handleEditSuccess(updatedCompetitor);
+            setEditingCompetitor(null);
+          }}
+        />
+      )}
+        
+      <DataTable 
+        key={competitors.length}
         columns={columns} 
         data={filteredCompetitors} 
       />

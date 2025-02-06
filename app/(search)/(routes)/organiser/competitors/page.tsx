@@ -14,6 +14,7 @@ const CompetitorsPage = async () => {
     where: { userId },
     orderBy: { createdAt: "desc" },
     include: {
+      ageCategories: true,
       competitors: {
         include: {
           ageCategory: true

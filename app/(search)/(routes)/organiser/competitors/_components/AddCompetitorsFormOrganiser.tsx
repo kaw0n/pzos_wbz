@@ -1,7 +1,6 @@
-// app/(dashboard)/_components/CompetitorEditForm.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -35,19 +34,15 @@ interface EditFormProps {
   id: string
   competitor: CompetitorWithAgeCategory;
   ageCategories: AgeCategory[];
-  onSuccess: () => void;
+  onSuccess: (updatedCompetitor: CompetitorWithAgeCategory) => void;
 }
 
 const formSchema = z.object({
-  name: z.string().min(1),
-  surname: z.string().min(1),
-  chip: z.number().min(1),
-  ageCategoryId: z.string().min(1),
+  name: z.string().min(1, "Imię jest wymagane"),
+  surname: z.string().min(1, "Nazwisko jest wymagane"),
+  chip: z.number().min(1, "Numer karty SI jest wymagany"),
+  ageCategoryId: z.string().min(1, "Kategoria wiekowa jest wymagana"),
 });
-
-"use client";
-
-import { useEffect } from "react"; // Dodany hook
 
 export const EditCompetitorsFormOrganiser = ({ 
   competitor,
@@ -55,9 +50,13 @@ export const EditCompetitorsFormOrganiser = ({
   id,
   onSuccess
 }: EditFormProps) => {
+  const [open, setOpen] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { // Uzupełnione defaultowe wartości
+    defaultValues: {
       name: competitor.name,
       surname: competitor.surname,
       chip: competitor.chip,
@@ -65,7 +64,6 @@ export const EditCompetitorsFormOrganiser = ({
     }
   });
 
-  // Resetuj formularz przy zmianie zawodnika
   useEffect(() => {
     form.reset({
       name: competitor.name,
@@ -73,18 +71,21 @@ export const EditCompetitorsFormOrganiser = ({
       chip: competitor.chip,
       ageCategoryId: competitor.ageCategoryId
     });
-  }, [competitor]);
+  }, [competitor, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
+      console.log("Wysyłane dane:", { ...values, chip: Number(values.chip), eventId: competitor.eventId });
       const response = await axios.patch(`/api/competitors/${id}`, {
         ...values,
-        chip: Number(values.chip) // Konwersja na number
+        chip: Number(values.chip),
+        eventId: competitor.eventId
       });
       
       toast.success("Zawodnik zaktualizowany");
-      onSuccess(response.data); // Wywołanie callbacka z nowymi danymi
+      onSuccess(response.data);
+      setOpen(false);
       router.refresh();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -100,7 +101,13 @@ export const EditCompetitorsFormOrganiser = ({
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        form.reset();
+        setOpen(false);
+        onSuccess(competitor);
+      }
+    }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Edytuj Zawodnika</AlertDialogTitle>
@@ -114,7 +121,7 @@ export const EditCompetitorsFormOrganiser = ({
                 <FormItem>
                   <FormLabel>Imię zawodnika</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Podaj imię" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -127,7 +134,7 @@ export const EditCompetitorsFormOrganiser = ({
                 <FormItem>
                   <FormLabel>Nazwisko zawodnika</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Podaj nazwisko" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,9 +145,14 @@ export const EditCompetitorsFormOrganiser = ({
               name="chip"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Numer karty SI zawodnika</FormLabel>
+                  <FormLabel>Numer karty SI</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      placeholder="Podaj numer chipu"
+                      onChange={e => field.onChange(Number(e.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -153,9 +165,9 @@ export const EditCompetitorsFormOrganiser = ({
                 <FormItem>
                   <FormLabel>Kategoria wiekowa</FormLabel>
                   <Combobox
-                    options={ageCategories.map(c => ({
-                      label: c.name,
-                      value: c.id
+                    options={ageCategories.map(ageCategory => ({
+                      label: ageCategory.name,
+                      value: ageCategory.id
                     }))}
                     value={field.value}
                     onChange={field.onChange}
@@ -164,9 +176,22 @@ export const EditCompetitorsFormOrganiser = ({
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save changes"}
+            <div className="flex justify-end gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+            >
+              Anuluj
             </Button>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="min-w-[120px]"
+              >
+                {loading ? "Zapisywanie..." : "Zapisz zmiany"}
+              </Button>
+            </div>
           </form>
         </Form>
       </AlertDialogContent>
