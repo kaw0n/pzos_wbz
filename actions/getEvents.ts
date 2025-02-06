@@ -37,7 +37,7 @@ export const getEvents = async ({
         competitors: true,
       },
       orderBy: {
-        createdAt: "desc",
+        date: "asc",
       },
     });
 
