@@ -43,7 +43,7 @@ export const ConfirmModal = ({
                     </AlertDialogCancel>
                     <AlertDialogAction 
                     onClick={handleConfirm}
-                    className="rounded-full bg-green-600 text-white">
+                    className="rounded-full hover:opacity-75 hover:border-red-600 hover:bg-red-100 hover:text-red-600  hover:br-red-100  hover:border-2 transition">
                         Kontynuuj
                     </AlertDialogAction>
                 </AlertDialogFooter>

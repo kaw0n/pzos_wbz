@@ -11,8 +11,12 @@ const CompetitorsPage = async () => {
   }
 
   const events = await db.event.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
+    where: { 
+      userId 
+    },
+    orderBy: { 
+      createdAt: "desc" 
+    },
     include: {
       ageCategories: true,
       competitors: {

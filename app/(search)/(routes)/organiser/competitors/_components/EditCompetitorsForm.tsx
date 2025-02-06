@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -19,12 +21,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Combobox } from "@/components/Combobox";
 import { z } from "zod";
 import { AgeCategory, Competitor } from "@prisma/client";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type CompetitorWithAgeCategory = Competitor & {
   ageCategory: AgeCategory
@@ -34,7 +36,6 @@ interface EditFormProps {
   id: string
   competitor: CompetitorWithAgeCategory;
   ageCategories: AgeCategory[];
-  onSuccess: (updatedCompetitor: CompetitorWithAgeCategory) => void;
 }
 
 const formSchema = z.object({
@@ -44,14 +45,14 @@ const formSchema = z.object({
   ageCategoryId: z.string().min(1, "Kategoria wiekowa jest wymagana"),
 });
 
-export const EditCompetitorsFormOrganiser = ({ 
+export const EditCompetitorsForm = ({ 
   competitor,
-  ageCategories,
   id,
-  onSuccess
+  ageCategories
 }: EditFormProps) => {
   const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setEditing] = useState<CompetitorWithAgeCategory | null>(null)
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,27 +65,17 @@ export const EditCompetitorsFormOrganiser = ({
     }
   });
 
-  useEffect(() => {
-    form.reset({
-      name: competitor.name,
-      surname: competitor.surname,
-      chip: competitor.chip,
-      ageCategoryId: competitor.ageCategoryId
-    });
-  }, [competitor, form]);
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
-      console.log("Wysyłane dane:", { ...values, chip: Number(values.chip), eventId: competitor.eventId });
-      const response = await axios.patch(`/api/competitors/${id}`, {
+      setEditing(competitor);
+      await axios.patch(`/api/competitors/${id}`, {
         ...values,
         chip: Number(values.chip),
         eventId: competitor.eventId
       });
       
       toast.success("Zawodnik zaktualizowany");
-      onSuccess(response.data);
       setOpen(false);
       router.refresh();
     } catch (error) {
@@ -97,17 +88,21 @@ export const EditCompetitorsFormOrganiser = ({
       toast.error("Coś poszło nie tak");
     } finally {
       setLoading(false);
+      setEditing(null);
     }
   };
 
+  const { isSubmitting, isValid } = form.formState;
+
   return (
-    <AlertDialog open={open} onOpenChange={(isOpen) => {
+    <AlertDialog 
+    open={open} onOpenChange={(isOpen) => {
       if (!isOpen) {
         form.reset();
         setOpen(false);
-        onSuccess(competitor);
       }
-    }}>
+    }}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Edytuj Zawodnika</AlertDialogTitle>
@@ -164,34 +159,42 @@ export const EditCompetitorsFormOrganiser = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kategoria wiekowa</FormLabel>
-                  <Combobox
-                    options={ageCategories.map(ageCategory => ({
-                      label: ageCategory.name,
-                      value: ageCategory.id
-                    }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <FormControl>
+                  <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Wybierz kategorię wiekową" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {ageCategories
+                            .map((ageCategory) => (
+                              <SelectItem key={ageCategory.id} value={ageCategory.id}>
+                                {ageCategory.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex justify-end gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <AlertDialogFooter className="mt-4">
+              <AlertDialogCancel 
               onClick={() => setOpen(false)}
-            >
-              Anuluj
-            </Button>
-              <Button 
-                type="submit" 
-                disabled={loading}
-                className="min-w-[120px]"
               >
-                {loading ? "Zapisywanie..." : "Zapisz zmiany"}
-              </Button>
-            </div>
+                Anuluj
+              </AlertDialogCancel>
+              <AlertDialogAction
+              onClick={form.handleSubmit(onSubmit)}
+              type="submit"
+              disabled={ !isValid || isSubmitting}
+              >
+                 Edytuj
+              </AlertDialogAction>
+            </AlertDialogFooter>
           </form>
         </Form>
       </AlertDialogContent>

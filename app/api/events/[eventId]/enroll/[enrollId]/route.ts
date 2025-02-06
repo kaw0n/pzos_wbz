@@ -66,7 +66,7 @@ export async function DELETE(
         return NextResponse.json(enroll)
 
     }catch(error){
-        console.log("[FILEID]", error)
+        console.log("[ENROLLID_DELETE]", error)
         return new NextResponse("Wewnętrzny błąd serwera", {status:500})
     }
 }
