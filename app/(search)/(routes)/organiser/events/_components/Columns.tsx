@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Competitor, Event } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Link, PenLine } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowUpDown, PenLine } from "lucide-react"
+import Link from "next/link"
+import { redirect, useRouter } from "next/navigation"
 
 export type EventWithCompetitors = Event & {
   competitors: Competitor[];
@@ -57,20 +58,16 @@ export const columns: ColumnDef<EventWithCompetitors>[] = [
   {
     id: "actions",
     cell: ({row}) =>{
-      const router = useRouter();
         const {id} = row.original
 
-        const handleEdit = (id: string) => {
-          router.push(`/organiser/events/${id}`);
-        };
-
-        return(        
-          <Button 
-          variant="outline" 
-          className="rounded-full" 
-          onClick={() => handleEdit(id)}>
-            <PenLine className="h-4 w-4"/>
-          </Button>    
+        return(
+          <Link href={`/organiser/events/${id}`}>        
+            <Button 
+            variant="outline" 
+            className="rounded-full"> 
+              <PenLine className="h-4 w-4"/>
+            </Button> 
+          </Link>   
         )
     }
   }
