@@ -60,9 +60,7 @@ export const AddCompetitorsForm = ({
   const formSchema = z.object({
     name: z.string().min(1),
     surname: z.string().min(1),
-    chip: event.ifSportIdent 
-        ? z.number().min(499999).max(9999999)
-        : z.number().min(499999).max(9999999).optional(),
+    chip: z.number().min(499999).max(9999999),
     ageCategoryId: z.string().min(1),
   });
 
@@ -72,7 +70,7 @@ export const AddCompetitorsForm = ({
         name: "",
         surname: "",
         ageCategoryId: "",
-        chip: event.ifSportIdent ? undefined : undefined,
+        chip:  undefined,
       }
     });
 
@@ -167,7 +165,7 @@ export const AddCompetitorsForm = ({
                     </FormItem>
                   )}
                 />
-                {event.ifSportIdent && (
+               
                   <FormField
                     control={form.control}
                     name="chip"
@@ -187,7 +185,7 @@ export const AddCompetitorsForm = ({
                       </FormItem>
                     )}
                   />
-                )}
+                
                 <FormField
                   control={form.control}
                   name="ageCategoryId"

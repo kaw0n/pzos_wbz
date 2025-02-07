@@ -42,11 +42,7 @@ export async function POST(
             return new NextResponse("Brak dostępu", {status: 403})
         }
 
-        if (event.ifSportIdent && !values.chip) {
-            return new NextResponse("Numer karty SI jest wymagany", { status: 400 });
-        }
-
-        if (values.chip) {
+        
             const existingCompetitor = await db.competitor.findFirst({
                 where: {
                     eventId: params.eventId,
@@ -60,7 +56,7 @@ export async function POST(
                     { status: 400 }
                 );
             }
-        }
+        
 
         const competitor = await db.competitor.create({
             data: {
