@@ -42,15 +42,24 @@ export async function POST(
             return new NextResponse("Brak dostępu", {status: 403})
         }
 
-        const existingCompetitor = await db.competitor.findFirst({
-            where: {
-              eventId: params.eventId,
-              chip: values.chip
-            }
-        });
+        if (event.ifSportIdent && !values.chip) {
+            return new NextResponse("Numer karty SI jest wymagany", { status: 400 });
+        }
 
-        if (existingCompetitor) {
-            return new NextResponse("Zawodnik z tym numerem chip już istnieje w tym wydarzeniu", { status: 400 });
+        if (values.chip) {
+            const existingCompetitor = await db.competitor.findFirst({
+                where: {
+                    eventId: params.eventId,
+                    chip: values.chip,
+                },
+            });
+
+            if (existingCompetitor) {
+                return new NextResponse(
+                    "Zawodnik z tym numerem chip już istnieje w tym wydarzeniu",
+                    { status: 400 }
+                );
+            }
         }
 
         const competitor = await db.competitor.create({

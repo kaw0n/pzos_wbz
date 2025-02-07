@@ -68,6 +68,7 @@ const EnrollmentPage = async ({ params }: { params: Params }) => {
             </div>
             <DeleteEnroll params={params} />
             <AddCompetitorsForm
+            event={event}
             enrollData={enroll}
             eventId={enroll.eventId}
             enrollId={enroll.id}

@@ -14,6 +14,7 @@ import FilesForm from "./_components/FilesForm";
 import  PublishAction  from "./_components/actions/PublishAction";
 import DeleteAction from "./_components/actions/DeleteAction";
 import AgeCategoryForm from "./_components/AgeCategoryForm";
+import { IsSportIdentForm } from "./_components/IsSportIdentForm";
 const MapForm = dynamic(() => import('./_components/MapForm'), { ssr: false });
 
 
@@ -110,6 +111,10 @@ const EventIdPage = async({
                             Dostosuj wydarzenie
                         </h2>
                     </div>
+                    <IsSportIdentForm
+                    eventData={event}
+                    eventId={event.id}
+                    />
                     <TitleForm
                     eventData={event}
                     eventId={event.id}

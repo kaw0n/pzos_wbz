@@ -1,6 +1,6 @@
 "use client";
 
-import { AgeCategory, Competitor, Enroll } from "@prisma/client";
+import { AgeCategory, Competitor, Enroll, Event } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -44,21 +44,27 @@ interface AddCompetitorsFormProps {
   enrollId: string;
   eventId: string;
   ageCategories: AgeCategoryOption[];
+  event: Event
 }
 
-const formSchema = z.object({
-  name: z.string().min(1),
-  surname: z.string().min(1),
-  chip: z.number().min(499999).max(9999999),
-  ageCategoryId: z.string().min(1),
-});
+
 
 export const AddCompetitorsForm = ({
   enrollData,
   enrollId,
   eventId,
-  ageCategories
+  ageCategories,
+  event
 }: AddCompetitorsFormProps) => {
+
+  const formSchema = z.object({
+    name: z.string().min(1),
+    surname: z.string().min(1),
+    chip: event.ifSportIdent 
+        ? z.number().min(499999).max(9999999)
+        : z.number().min(499999).max(9999999).optional(),
+    ageCategoryId: z.string().min(1),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -66,7 +72,7 @@ export const AddCompetitorsForm = ({
         name: "",
         surname: "",
         ageCategoryId: "",
-        chip: undefined
+        chip: event.ifSportIdent ? undefined : undefined,
       }
     });
 
@@ -161,25 +167,27 @@ export const AddCompetitorsForm = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="chip"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Numer karty SI zawodnika</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          disabled={isSubmitting}
-                          placeholder="np. '887230'"
-                          value={field.value}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {event.ifSportIdent && (
+                  <FormField
+                    control={form.control}
+                    name="chip"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Numer karty SI zawodnika</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            disabled={isSubmitting}
+                            placeholder="np. '887230'"
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="ageCategoryId"

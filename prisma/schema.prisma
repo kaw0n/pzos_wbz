@@ -14,16 +14,17 @@ datasource db {
 }
 
 model Event {
-  id          String    @id @default(uuid())
-  userId      String
-  title       String?   @db.Text
-  description String?   @db.Text
-  imageUrl    String?   @db.Text
-  location    Json?
-  date        DateTime?
-  price       Float?
-  isPublic    Boolean   @default(false)
-  categoryId  String?
+  id           String    @id @default(uuid())
+  userId       String
+  title        String?   @db.Text
+  description  String?   @db.Text
+  imageUrl     String?   @db.Text
+  location     Json?
+  date         DateTime?
+  price        Float?
+  isPublic     Boolean   @default(false)
+  categoryId   String?
+  ifSportIdent Boolean   @default(true)
 
   ageCategories AgeCategory[]
   files         File[]
@@ -63,7 +64,7 @@ model Competitor {
   id            String  @id @default(uuid())
   name          String
   surname       String
-  chip          Int
+  chip          Int?
   ageCategoryId String
   eventId       String
   enrollId      String?
