@@ -55,7 +55,7 @@ interface EventsComboboxProps {
 const formSchema = z.object({
     name: z.string().min(1),
     surname: z.string().min(1),
-    chip: z.number().min(1),
+    chip: z.number().min(499999).max(9999999),
     ageCategoryId: z.string().min(1),
 });
 

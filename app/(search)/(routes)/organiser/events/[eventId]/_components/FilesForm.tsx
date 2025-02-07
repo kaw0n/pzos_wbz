@@ -12,6 +12,28 @@ import { cn } from "@/lib/utils";
 import Uploader from "@/components/Uploader";
 import FileNameForm from "./FileNameForm";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import{
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+ } from "@/components/ui/form"
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 interface FilesFormProps {
   eventData: Event & { files: File[] };
   eventId: string;
@@ -19,6 +41,7 @@ interface FilesFormProps {
 
 const formSchema = z.object({
   url: z.string().min(1),
+  visibleName: z.string().min(1),
 });
 
 export const FilesForm = ({
@@ -26,10 +49,16 @@ export const FilesForm = ({
   eventId,
 }: FilesFormProps) => {
 
+  const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        visibleName: ""
+      }
+    });
+
   const [isEditing, setIsEditing] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-
-  const editingState = () => setIsEditing((current) => !current);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const router = useRouter();
 
@@ -37,7 +66,8 @@ export const FilesForm = ({
     try {
       await axios.post(`/api/events/${eventId}/files`, values);
       toast.success("Wydarzenie zaktualizowane");
-      editingState();
+      setIsEditing(false);
+      form.reset()
       router.refresh();
     } catch {
       toast.error("Coś poszło nie tak");
@@ -59,7 +89,7 @@ export const FilesForm = ({
     }
   }
 
-  
+  const { isSubmitting, isValid } = form.formState;
 
   return (
     <div
@@ -68,23 +98,72 @@ export const FilesForm = ({
         eventData.files.length===0 ? "bg-gray-100" : "bg-green-100"
       )}
     >
-      <div className="font-md flex items-center justify-between">
-        Pliki
-        <Button onClick={editingState} variant="outline" className="rounded-full">
-          {isEditing && (
-            <>
-              <PenOff className="h-4 w-4 mr-2" />
-              Anuluj
-            </>
-          )}
-          {!isEditing && (
-            <>
-              <FilePlus className="h-4 w-4 mr-2" />
-              Dodaj
-            </>
-          )}
-        </Button>
-      </div>
+          <div className="font-md flex items-center justify-between">
+            Pliki
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="rounded-full">
+                  <FilePlus className="h-4 w-4 mr-2" />
+                  Dodaj
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+              <AlertDialogTitle>Dodaj pliki</AlertDialogTitle>
+              <AlertDialogHeader>Prześlij plik</AlertDialogHeader>
+                <Uploader
+                  endpoint="eventFile"
+                  onChange={(url) => {
+                    if (url) {
+                      form.setValue("url", url);
+                      toast.success("Plik przesłany");
+                      setUploadSuccess(true);
+                    }
+                  }}
+                />
+                {uploadSuccess && (
+                  <div className="mt-2 text-sm text-green-600">
+                    Plik dodany
+                  </div>
+                )} 
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <FormField
+                      control={form.control}
+                      name="visibleName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nazwa pliku</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={isSubmitting}
+                              placeholder="np. 'Wyniki Etap 1'"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <AlertDialogFooter className="mt-4">
+                      <AlertDialogCancel onClick={() => {
+                        form.reset()
+                        setUploadSuccess(false)
+                        }}>
+                        Anuluj
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                      type="submit" 
+                      disabled={!isValid || isSubmitting}
+                      >
+                         Zatwierdź
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </form>
+                </Form>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
       {!isEditing && (
         <>
             {eventData.files.length === 0 && (
@@ -126,18 +205,6 @@ export const FilesForm = ({
             </div>
             )}
         </>
-      )}
-      {isEditing && (
-        <div className="h-60 w-full">
-          <Uploader
-            endpoint="eventFile"
-            onChange={(url) => {
-              if (url) {
-                handleSubmit({ url : url  });
-              }
-            }}
-          />
-        </div>
       )}
     </div>
   );

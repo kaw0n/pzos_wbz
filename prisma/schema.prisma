@@ -39,10 +39,10 @@ model Event {
 }
 
 model File {
-  id          String  @id @default(uuid())
+  id          String @id @default(uuid())
   name        String
-  url         String  @db.Text
-  visibleName String?
+  url         String @db.Text
+  visibleName String
 
   eventId String
   event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
